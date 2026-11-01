@@ -1,0 +1,139 @@
+{
+  "entities": {
+    "SchoolInfo": {
+      "title": "SchoolInfo",
+      "description": "معلومات المدرسة الرسمية والهيكل التعليمي",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "directorate": { "type": "string", "maxLength": 120 },
+        "principal": { "type": "string", "maxLength": 100 },
+        "schoolCode": { "type": "string", "maxLength": 50 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "address": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["id", "name", "directorate", "schoolCode"]
+    },
+    "User": {
+      "title": "User",
+      "description": "حسابات مستخدمي النظام والصلاحيات",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["PRINCIPAL", "TEACHER", "INSTRUCTOR", "PARENT"] },
+        "phone": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "fullName", "role", "createdAt"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "عضو الكادر التدريسي (معلم أو مدرس)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "type": { "type": "string", "enum": ["TEACHER", "INSTRUCTOR"] },
+        "specialization": { "type": "string", "maxLength": 80 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "classes": { "type": "string", "maxLength": 200 },
+        "weeklyQuotas": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "name", "type", "specialization"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "سجل الطالب المدرسي",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "stage": { "type": "string", "maxLength": 50 },
+        "gradeLevel": { "type": "string", "maxLength": 50 },
+        "section": { "type": "string", "maxLength": 20 },
+        "parentName": { "type": "string", "maxLength": 100 },
+        "parentPhone": { "type": "string", "maxLength": 20 },
+        "birthDate": { "type": "string", "maxLength": 20 },
+        "academicYear": { "type": "string", "maxLength": 20 },
+        "enrollmentNumber": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "fullName", "gradeLevel", "section", "parentName", "academicYear"]
+    },
+    "AcademicYear": {
+      "title": "AcademicYear",
+      "description": "سجل إداري للسنوات الدراسية وتواريخها وحالتها (نشطة / مؤرشفة)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "yearName": { "type": "string", "maxLength": 50 },
+        "startDate": { "type": "string", "maxLength": 20 },
+        "endDate": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["ACTIVE", "ARCHIVED", "PLANNED"] }
+      },
+      "required": ["id", "yearName", "startDate", "endDate", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "إشعارات النظام وأولياء الأمور والكادر",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 100 },
+        "body": { "type": "string", "maxLength": 300 },
+        "targetRole": { "type": "string", "maxLength": 50 },
+        "read": { "type": "boolean" },
+        "timestamp": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "body", "timestamp"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "سجل العمليات والتدقيق الإداري الرقمي",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "action": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "performedBy": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "maxLength": 50 },
+        "details": { "type": "string", "maxLength": 500 },
+        "timestamp": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "action", "performedBy", "details", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/schools/{schoolId}": {
+      "schema": { "$ref": "SchoolInfo" },
+      "description": "بيانات المدرسة والمديرية"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "مستخدمو النظام"
+    },
+    "/teachers/{teacherId}": {
+      "schema": { "$ref": "Teacher" },
+      "description": "الكادر التدريسي"
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "Student" },
+      "description": "سجلات الطلاب"
+    },
+    "/academicYears/{yearId}": {
+      "schema": { "$ref": "AcademicYear" },
+      "description": "السنوات الدراسية"
+    },
+    "/notifications/{notifId}": {
+      "schema": { "$ref": "Notification" },
+      "description": "إشعارات النظام"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "AuditLog" },
+      "description": "سجلات التدقيق الرقمي"
+    }
+  }
+}

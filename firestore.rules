@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId &&
+        incoming().keys().hasAll(['id', 'fullName', 'role', 'createdAt']) &&
+        incoming().fullName is string && incoming().fullName.size() <= 100 &&
+        incoming().role in ['PRINCIPAL', 'TEACHER', 'INSTRUCTOR', 'PARENT'];
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) &&
+        incoming().id == existing().id &&
+        incoming().role == existing().role;
+      allow delete: if isAdmin();
+    }
+
+    // Teachers Collection
+    match /teachers/{teacherId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Students Collection
+    match /students/{studentId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Attendance Collection
+    match /attendance/{attendanceId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Grades Collection
+    match /grades/{gradeId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Lesson Plans Collection
+    match /lessonPlans/{planId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Audit Logs Collection
+    match /auditLogs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() &&
+        incoming().keys().hasAll(['id', 'action', 'performedBy', 'details', 'timestamp']) &&
+        incoming().action is string && incoming().action.size() <= 100;
+      allow update, delete: if false; // Audit logs are immutable
+    }
+  }
+}

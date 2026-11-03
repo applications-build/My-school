@@ -437,25 +437,24 @@ function getSchoolData() {
           { id: 'stg-1', name: 'المرحلة الابتدائية', code: 'PRIMARY', order: 1, requiresBranch: false },
         ];
       }
-      if (data.classes) {
-        data.classes = data.classes.filter((c: any) => c.stage === 'PRIMARY' || !c.stage || c.level?.includes('الابتدائي'));
-        if (data.classes.length === 0) {
-          data.classes = [
-            { id: 'c-1', stage: 'PRIMARY', level: 'الصف السادس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-            { id: 'c-2', stage: 'PRIMARY', level: 'الصف الخامس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-            { id: 'c-3', stage: 'PRIMARY', level: 'الصف الرابع الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-            { id: 'c-4', stage: 'PRIMARY', level: 'الصف الثالث الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-          ];
-        }
-      }
+      if (!data.classes) data.classes = [];
+      if (!data.teachers) data.teachers = [];
+      if (!data.students) data.students = [];
+      if (!data.parents) data.parents = [];
+      if (!data.studentParentRelations) data.studentParentRelations = [];
+      if (!data.attendance) data.attendance = [];
+      if (!data.grades) data.grades = [];
+      if (!data.homework) data.homework = [];
+      if (!data.lessonPlans) data.lessonPlans = [];
+      if (!data.timetables) data.timetables = [];
+      if (!data.staffAllocations) data.staffAllocations = [];
+      if (!data.studentTransfers) data.studentTransfers = [];
       if (!data.branches) {
         data.branches = [
           { id: 'br-4', name: 'الفرع العام', code: 'GENERAL', stageCode: 'PRIMARY' },
         ];
       }
-      if (!data.staffAllocations) data.staffAllocations = [];
-      if (!data.studentTransfers) data.studentTransfers = [];
-      if (!data.accounts) {
+      if (!data.accounts || data.accounts.length === 0) {
         data.accounts = [
           {
             id: 'u-principal',
@@ -467,133 +466,6 @@ function getSchoolData() {
             status: 'ACTIVE',
             createdAt: '2024-09-15',
           },
-          {
-            id: 't-1',
-            fullName: 'علي حسين الكاظمي',
-            role: 'TEACHER',
-            email: 'teacher@iqschool.edu',
-            phone: '07700000001',
-            passwordHash: '123456',
-            status: 'ACTIVE',
-            assignedClassIds: ['c-1', 'c-2'],
-            assignedSubjects: ['قواعد اللغة العربية', 'التربية الإسلامية'],
-            createdAt: '2024-09-15',
-          },
-          {
-            id: 't-2',
-            fullName: 'فاطمة كريم الأسدي',
-            role: 'TEACHER',
-            email: 'fatima@iqschool.edu',
-            phone: '07700000002',
-            passwordHash: '123456',
-            status: 'ACTIVE',
-            assignedClassIds: ['c-2', 'c-3'],
-            assignedSubjects: ['الرياضيات', 'العلوم'],
-            createdAt: '2024-09-15',
-          },
-          {
-            id: 'u-parent',
-            fullName: 'محمد عبد الله العبيدي',
-            role: 'PARENT',
-            email: 'parent@iqschool.edu',
-            phone: '07700000003',
-            passwordHash: '123456',
-            status: 'ACTIVE',
-            linkedStudentIds: ['st-3'],
-            createdAt: '2024-09-15',
-          },
-        ];
-      }
-      if (!data.teachers || data.teachers.length === 0) {
-        data.teachers = [
-          {
-            id: 't-1',
-            name: 'أ. علي حسين الكاظمي',
-            fullName: 'أ. علي حسين الكاظمي',
-            type: 'TEACHER',
-            specialization: 'قواعد اللغة العربية',
-            phone: '07700000001',
-            email: 'teacher@iqschool.edu',
-            classes: 'الصف السادس الابتدائي - شعبة أ',
-            weeklyQuotas: 16,
-            employmentType: 'ملاك دائم',
-            appointmentDate: '2019-10-01',
-            registrationNumber: 'QD-2019-441',
-            createdAt: '2024-09-15',
-          },
-          {
-            id: 't-2',
-            name: 'أ. فاطمة كريم الأسدي',
-            fullName: 'أ. فاطمة كريم الأسدي',
-            type: 'TEACHER',
-            specialization: 'الرياضيات',
-            phone: '07700000002',
-            email: 'fatima@iqschool.edu',
-            classes: 'الصف الخامس الابتدائي - شعبة أ',
-            weeklyQuotas: 18,
-            employmentType: 'ملاك دائم',
-            appointmentDate: '2020-11-15',
-            registrationNumber: 'QD-2020-582',
-            createdAt: '2024-09-15',
-          },
-          {
-            id: 't-3',
-            name: 'أ. أحمد جاسم كاظم',
-            fullName: 'أ. أحمد جاسم كاظم',
-            type: 'TEACHER',
-            specialization: 'العلوم',
-            phone: '07801234561',
-            email: 'ahmed@iqschool.edu',
-            classes: 'الصف الرابع الابتدائي - شعبة أ',
-            weeklyQuotas: 14,
-            employmentType: 'عقد',
-            appointmentDate: '2022-09-20',
-            registrationNumber: 'QD-2022-809',
-            createdAt: '2024-09-15',
-          },
-        ];
-      }
-      if (!data.students || data.students.length === 0) {
-        data.students = [
-          {
-            id: 'st-1',
-            fullName: 'حيدر أحمد عباس',
-            stage: 'PRIMARY',
-            gradeLevel: 'الصف الرابع الابتدائي',
-            section: 'أ',
-            parentName: 'أحمد عباس جبر',
-            parentPhone: '07705551122',
-            birthDate: '2014-05-12',
-            academicYear: '2024 - 2025',
-            enrollmentNumber: 'ST-2024-101',
-            academicStatus: 'ACTIVE',
-          },
-          {
-            id: 'st-2',
-            fullName: 'جعفر علي حيدر',
-            stage: 'PRIMARY',
-            gradeLevel: 'الصف الخامس الابتدائي',
-            section: 'أ',
-            parentName: 'علي حيدر عبد الحسين',
-            parentPhone: '07701112233',
-            birthDate: '2013-08-20',
-            academicYear: '2024 - 2025',
-            enrollmentNumber: 'ST-2024-102',
-            academicStatus: 'ACTIVE',
-          },
-          {
-            id: 'st-3',
-            fullName: 'زينب محمد عبد الله',
-            stage: 'PRIMARY',
-            gradeLevel: 'الصف السادس الابتدائي',
-            section: 'أ',
-            parentName: 'محمد عبد الله العبيدي',
-            parentPhone: '07700000003',
-            birthDate: '2012-03-15',
-            academicYear: '2024 - 2025',
-            enrollmentNumber: 'ST-2024-103',
-            academicStatus: 'ACTIVE',
-          },
         ];
       }
       return data;
@@ -603,22 +475,32 @@ function getSchoolData() {
   }
 
   // Initial clean database structure without dummy records
-  const initialData = {
+  const initialData = createCleanFactoryDatabase();
+
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Failed to write initial school data:', e);
+  }
+
+  return initialData;
+}
+
+function createCleanFactoryDatabase() {
+  return {
     schoolInfo: {
-      name: 'مدرسة الرافدين النموذجية',
-      directorate: 'المديرية العامة لتربية بغداد / الرصافة الأولى',
+      name: 'مدرسة الرافدين النموذجية الابتدائية',
+      directorate: 'المديرية العامة لتربية بغداد',
       principal: 'مدير المدرسة',
-      schoolCode: 'IQ-BGD-2024-889',
+      schoolCode: 'IQ-PRIM-001',
       academicYear: '2024 - 2025',
       semester: 'الفصل الدراسي الأول',
       phone: '07700000000',
-      address: 'بغداد - شارع فلسطين - محلة 505',
+      address: 'العراق',
     },
     currentAcademicYear: '2024 - 2025',
     availableYears: [
-      { id: 'ay-2023', yearName: '2023 - 2024', startDate: '2023-09-15', endDate: '2024-06-30', status: 'ARCHIVED', notes: 'العام الدراسي السفير المكتمل' },
-      { id: 'ay-2024', yearName: '2024 - 2025', startDate: '2024-09-22', endDate: '2025-06-30', status: 'ACTIVE', notes: 'العام الدراسي الحالي والنشط' },
-      { id: 'ay-2025', yearName: '2025 - 2026', startDate: '2025-09-15', endDate: '2026-06-30', status: 'PLANNED', notes: 'عام الخطة المستقبلية' },
+      { id: 'ay-2024', yearName: '2024 - 2025', startDate: '2024-09-22', endDate: '2025-06-30', status: 'ACTIVE', notes: 'العام الدراسي الحالي' },
     ],
     accounts: [
       {
@@ -631,55 +513,35 @@ function getSchoolData() {
         status: 'ACTIVE',
         createdAt: '2024-09-15',
       },
-      {
-        id: 't-1',
-        fullName: 'علي حسين الكاظمي',
-        role: 'TEACHER',
-        email: 'teacher@iqschool.edu',
-        phone: '07700000001',
-        passwordHash: '123456',
-        status: 'ACTIVE',
-        assignedClassIds: ['c-1', 'c-2'],
-        assignedSubjects: ['قواعد اللغة العربية', 'التربية الإسلامية'],
-        createdAt: '2024-09-15',
-      },
-      {
-        id: 'u-parent',
-        fullName: 'محمد عبد الله العبيدي',
-        role: 'PARENT',
-        email: 'parent@iqschool.edu',
-        phone: '07700000003',
-        passwordHash: '123456',
-        status: 'ACTIVE',
-        linkedStudentIds: [],
-        createdAt: '2024-09-15',
-      },
     ],
-    classes: [
-      { id: 'c-1', stage: 'PRIMARY', level: 'الصف السادس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-      { id: 'c-2', stage: 'PRIMARY', level: 'الصف الخامس الابتدائي', section: 'ب', supervisorId: '', studentCount: 0 },
-      { id: 'c-3', stage: 'PRIMARY', level: 'الصف الرابع الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-      { id: 'c-4', stage: 'PRIMARY', level: 'الصف الثالث الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+    stages: [
+      { id: 'stg-1', name: 'المرحلة الابتدائية', code: 'PRIMARY', order: 1, requiresBranch: false },
     ],
+    branches: [
+      { id: 'br-4', name: 'الفرع العام', code: 'GENERAL', stageCode: 'PRIMARY' },
+    ],
+    classes: [],
     subjects: [
-      { id: 'sub-1', name: 'التربية الإسلامية', code: 'ISL-101', stage: 'PRIMARY', weeklyHours: 2 },
-      { id: 'sub-2', name: 'قواعد اللغة العربية', code: 'ARB-101', stage: 'PRIMARY', weeklyHours: 4 },
-      { id: 'sub-3', name: 'الرياضيات', code: 'MTH-101', stage: 'PRIMARY', weeklyHours: 4 },
-      { id: 'sub-4', name: 'الفيزياء', code: 'PHY-301', stage: 'SECONDARY', branch: 'SCIENTIFIC', weeklyHours: 4 },
-      { id: 'sub-5', name: 'الكيمياء', code: 'CHM-301', stage: 'SECONDARY', branch: 'SCIENTIFIC', weeklyHours: 3 },
-      { id: 'sub-6', name: 'اللغة الإنكليزية', code: 'ENG-201', stage: 'INTERMEDIATE', weeklyHours: 4 },
+      { id: 'sub-1', name: 'التربية الإسلامية والقرآن الكريم', code: 'ISL-101', stage: 'PRIMARY', weeklyHours: 2 },
+      { id: 'sub-2', name: 'قواعد اللغة العربية وقراءتي', code: 'ARB-101', stage: 'PRIMARY', weeklyHours: 5 },
+      { id: 'sub-3', name: 'الرياضيات', code: 'MTH-101', stage: 'PRIMARY', weeklyHours: 5 },
+      { id: 'sub-4', name: 'العلوم', code: 'SCI-101', stage: 'PRIMARY', weeklyHours: 3 },
+      { id: 'sub-5', name: 'اللغة الإنكليزية', code: 'ENG-101', stage: 'PRIMARY', weeklyHours: 3 },
+      { id: 'sub-6', name: 'الاجتماعيات', code: 'SOC-101', stage: 'PRIMARY', weeklyHours: 2 },
+      { id: 'sub-7', name: 'التربية الفنية والنشيد', code: 'ART-101', stage: 'PRIMARY', weeklyHours: 1 },
+      { id: 'sub-8', name: 'التربية الرياضية والصحية', code: 'SPT-101', stage: 'PRIMARY', weeklyHours: 1 },
     ],
     specializations: [
       { id: 'sp-1', title: 'اللغة العربية والتربية الإسلامية', category: 'LANGUAGES' },
-      { id: 'sp-2', title: 'الرياضيات والهندسة', category: 'SCIENCES' },
-      { id: 'sp-3', title: 'الفيزياء والكيمياء', category: 'SCIENCES' },
+      { id: 'sp-2', title: 'الرياضيات', category: 'SCIENCES' },
+      { id: 'sp-3', title: 'العلوم العامة', category: 'SCIENCES' },
       { id: 'sp-4', title: 'اللغة الإنكليزية', category: 'LANGUAGES' },
-      { id: 'sp-5', title: 'التاريخ والجغرافيا', category: 'HUMANITIES' },
+      { id: 'sp-5', title: 'الاجتماعيات والوطنية', category: 'HUMANITIES' },
     ],
-    curricula: [
-      { id: 'curr-1', subjectName: 'الفيزياء للصف السادس العلمي', editionYear: '2024 - الطبعة العاشرة', authoringBody: 'وزارة التربية العراقية - المديرية العامة للمناهج' },
-      { id: 'curr-2', subjectName: 'قواعد اللغة العربية للصف السادس الابتدائي', editionYear: '2024 - الطبعة الثامنة', authoringBody: 'وزارة التربية العراقية - المديرية العامة للمناهج' },
-    ],
+    curricula: [],
+    curriculumEditions: DEFAULT_CURRICULUM_EDITIONS,
+    subjectPlans: [],
+    lessonProgressLogs: [],
     teachers: [],
     students: [],
     parents: [],
@@ -691,9 +553,9 @@ function getSchoolData() {
     timetables: [],
     notifications: [
       {
-        id: 'notif-welcome',
+        id: `notif-welcome-${Date.now()}`,
         title: 'مرحباً بك في نظام مدرستي',
-        body: 'تم تشغيل الهيكلية المدرسية السحابية بنجاح للعام الدراسي الحالي.',
+        body: 'تم تشغيل الهيكلية المدرسية النظيفة بنجاح. النظام جاهز لإدخال الشعب والمعلمين والطلاب.',
         category: 'SYSTEM',
         targetRole: 'ALL',
         read: false,
@@ -702,24 +564,16 @@ function getSchoolData() {
     ],
     auditLogs: [
       {
-        id: 'log-1',
-        action: 'تهيئة السجلات الرسمية الخالية',
+        id: `log-init-${Date.now()}`,
+        action: 'تهيئة السجلات الرسمية وتصفير البيانات',
         category: 'SYSTEM',
-        performedBy: 'إدارة المدرسة',
+        performedBy: 'مدير المدرسة',
         role: 'PRINCIPAL',
-        details: 'تم إنشاء الهيكلية السحابية الشاملة وجداول العلاقات دون بيانات وهمية.',
+        details: 'تم بدء النظام كنسخة نظيفة خالية من أي بيانات افتراضية، بانتظار الإدخال الفعلي.',
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
       },
     ],
   };
-
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
-  } catch (e) {
-    console.error('Failed to write initial school data:', e);
-  }
-
-  return initialData;
 }
 
 // API Routes
@@ -969,6 +823,23 @@ app.post('/api/school-data', (req: Request, res: Response) => {
   } catch (error) {
     console.error('Save error:', error);
     res.status(500).json({ error: 'فشل حفظ البيانات على السيرفر' });
+  }
+});
+
+// POST /api/factory-reset (إعادة ضبط المصنع ومحو جميع البيانات)
+app.post('/api/factory-reset', (req: Request, res: Response) => {
+  try {
+    const cleanData = createCleanFactoryDatabase();
+    fs.writeFileSync(DATA_FILE, JSON.stringify(cleanData, null, 2), 'utf-8');
+    res.json({
+      success: true,
+      message: 'تمت إعادة ضبط المصنع ومحو كافة البيانات بنجاح',
+      data: cleanData,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Factory reset error:', error);
+    res.status(500).json({ error: 'فشل تنفيذ إعادة ضبط المصنع' });
   }
 });
 

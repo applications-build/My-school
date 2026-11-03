@@ -27,42 +27,8 @@ const INITIAL_FALLBACK_SCHOOL_DATA: SchoolDatabase = {
       phone: '07700000000',
       status: 'ACTIVE',
     },
-    {
-      id: 't-1',
-      fullName: 'علي حسين الكاظمي',
-      role: 'TEACHER',
-      email: 'teacher@iqschool.edu',
-      phone: '07700000001',
-      status: 'ACTIVE',
-      assignedClassIds: ['c-1', 'c-2'],
-      assignedSubjects: ['قواعد اللغة العربية', 'التربية الإسلامية'],
-    },
-    {
-      id: 't-2',
-      fullName: 'فاطمة كريم الأسدي',
-      role: 'TEACHER',
-      email: 'fatima@iqschool.edu',
-      phone: '07700000002',
-      status: 'ACTIVE',
-      assignedClassIds: ['c-3', 'c-4'],
-      assignedSubjects: ['الرياضيات', 'العلوم'],
-    },
-    {
-      id: 'u-parent',
-      fullName: 'محمد عبد الله العبيدي',
-      role: 'PARENT',
-      email: 'parent@iqschool.edu',
-      phone: '07700000003',
-      status: 'ACTIVE',
-      linkedStudentIds: [],
-    },
   ],
-  classes: [
-    { id: 'c-1', stage: 'PRIMARY', level: 'الصف السادس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-    { id: 'c-2', stage: 'PRIMARY', level: 'الصف الخامس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-    { id: 'c-3', stage: 'PRIMARY', level: 'الصف الرابع الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-    { id: 'c-4', stage: 'PRIMARY', level: 'الصف الثالث الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
-  ],
+  classes: [],
   subjects: [
     { id: 'sub-1', name: 'التربية الإسلامية', code: 'ISL-101', stage: 'PRIMARY', weeklyHours: 2 },
     { id: 'sub-2', name: 'قواعد اللغة العربية', code: 'ARB-101', stage: 'PRIMARY', weeklyHours: 4 },
@@ -355,5 +321,25 @@ export async function transitionAcademicYear(
   } catch (e) {
     console.warn('Failed to transition academic year:', e);
     return { success: false };
+  }
+}
+
+export async function factoryResetSchoolData(): Promise<{ success: boolean; data?: SchoolDatabase; message?: string }> {
+  try {
+    const res = await fetch('/api/factory-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const result = await safeParseJsonResponse<{ success: boolean; data?: SchoolDatabase; message?: string }>(res, { success: false });
+    if (result.success && result.data) {
+      localStorage.setItem('madrasati_offline_backup', JSON.stringify(result.data));
+      localStorage.setItem('madrasati_offline_db', JSON.stringify(result.data));
+      localStorage.removeItem('madrasati_pending_sync');
+      return result;
+    }
+    return result;
+  } catch (error) {
+    console.error('Factory reset error:', error);
+    throw error;
   }
 }

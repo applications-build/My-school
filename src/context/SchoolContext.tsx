@@ -45,6 +45,7 @@ import {
   createBackupSnapshot,
   restoreBackupSnapshot,
   transitionAcademicYear,
+  factoryResetSchoolData,
 } from '../services/api';
 
 // Role accounts representing each of the 4 required types
@@ -84,11 +85,15 @@ interface SchoolContextType {
   error: string | null;
   currentAccount: UserAccount;
   setCurrentAccount: (acc: UserAccount) => void;
+  logout: () => void;
   switchRole: (role: AccountType) => void;
   activeAcademicYear: string;
   setActiveAcademicYear: (year: string) => void;
   syncStatus: 'synced' | 'saving' | 'offline' | 'error';
   lastSynced: string;
+  isOnline: boolean;
+  factoryReset: () => Promise<boolean>;
+  deleteGrade: (id: string) => Promise<void>;
   // Permissions
   canManageAccounts: boolean;
   canManageStaff: boolean;
@@ -159,31 +164,87 @@ interface SchoolContextType {
 
 const SchoolContext = createContext<SchoolContextType | undefined>(undefined);
 
+const AUTH_STORAGE_KEY = 'madrasati_auth_session';
+const CURRENT_ACCOUNT_KEY = 'madrasati_current_account';
+const OFFLINE_DB_KEY = 'madrasati_offline_db';
+const PENDING_SYNC_KEY = 'madrasati_pending_sync';
+
 export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [db, setDb] = useState<SchoolDatabase | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Load initial cached DB if available so app renders immediately
+  const [db, setDb] = useState<SchoolDatabase | null>(() => {
+    try {
+      const cached = localStorage.getItem(OFFLINE_DB_KEY) || localStorage.getItem('madrasati_offline_backup');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.schoolInfo) return parsed;
+      }
+    } catch {}
+    return null;
+  });
+
+  const [loading, setLoading] = useState<boolean>(!db);
   const [error, setError] = useState<string | null>(null);
-  const [currentAccount, setCurrentAccount] = useState<UserAccount>(DEMO_ACCOUNTS.PRINCIPAL);
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  // Load persisted user account across page refreshes
+  const [currentAccount, setCurrentAccountState] = useState<UserAccount>(() => {
+    try {
+      const saved = localStorage.getItem(CURRENT_ACCOUNT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.fullName && parsed.role) return parsed;
+      }
+      const session = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (session) {
+        const parsed = JSON.parse(session);
+        if (parsed?.account?.fullName && parsed?.account?.role) return parsed.account;
+      }
+    } catch (e) {
+      console.warn('Session parse error:', e);
+    }
+    return DEMO_ACCOUNTS.PRINCIPAL;
+  });
+
+  const setCurrentAccount = (acc: UserAccount) => {
+    setCurrentAccountState(acc);
+    try {
+      localStorage.setItem(CURRENT_ACCOUNT_KEY, JSON.stringify(acc));
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ account: acc, timestamp: Date.now() }));
+    } catch (e) {
+      console.warn('Failed to save session account:', e);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(CURRENT_ACCOUNT_KEY);
+    sessionStorage.removeItem('madrasati_splash_seen');
+    setCurrentAccountState(DEMO_ACCOUNTS.PRINCIPAL);
+  };
+
   const [activeAcademicYear, setActiveAcademicYear] = useState<string>('2024 - 2025');
   const [syncStatus, setSyncStatus] = useState<'synced' | 'saving' | 'offline' | 'error'>('synced');
   const [lastSynced, setLastSynced] = useState<string>('الآن');
 
-  // Load database on mount
+  // Load database on mount and listen to network online / offline events
   useEffect(() => {
     let isMounted = true;
     async function init() {
       try {
-        setLoading(true);
+        if (!db) setLoading(true);
         const data = await fetchSchoolData();
         if (isMounted) {
           setDb(data);
           setActiveAcademicYear(data.currentAcademicYear || '2024 - 2025');
           setSyncStatus('synced');
           setLastSynced(new Date().toLocaleTimeString('ar-IQ'));
+          localStorage.setItem(OFFLINE_DB_KEY, JSON.stringify(data));
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(err.message || 'حدث خطأ أثناء تحميل بيانات المدرسة');
+          if (!db) {
+            setError(err.message || 'حدث خطأ أثناء تحميل بيانات المدرسة');
+          }
           setSyncStatus('offline');
         }
       } finally {
@@ -191,41 +252,116 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
     }
     init();
+
+    // Listen to real-time network status changes
+    const handleOnline = async () => {
+      setIsOnline(true);
+      setSyncStatus('saving');
+      try {
+        const hasPending = localStorage.getItem(PENDING_SYNC_KEY);
+        if (hasPending) {
+          const cached = localStorage.getItem(OFFLINE_DB_KEY);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            await saveSchoolData(parsed);
+            localStorage.removeItem(PENDING_SYNC_KEY);
+          }
+        } else {
+          const latest = await fetchSchoolData();
+          if (isMounted) setDb(latest);
+        }
+        setSyncStatus('synced');
+        setLastSynced(new Date().toLocaleTimeString('ar-IQ'));
+      } catch {
+        setSyncStatus('synced');
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setSyncStatus('offline');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
-  // Internal helper to persist state and update audit log
+  // Internal helper to persist state locally and remotely with audit log
   const commitDbChange = async (newDb: SchoolDatabase, auditAction?: string, auditDetails?: string) => {
+    // 1. Instantly update React state
     setDb(newDb);
+    
+    // 2. Instantly persist to local storage cache for offline resilience
+    try {
+      localStorage.setItem(OFFLINE_DB_KEY, JSON.stringify(newDb));
+      localStorage.setItem('madrasati_offline_backup', JSON.stringify(newDb));
+    } catch (e) {
+      console.warn('LocalStorage offline cache error:', e);
+    }
+
+    if (auditAction) {
+      const actorName =
+        currentAccount.role === 'TEACHER' || currentAccount.role === 'INSTRUCTOR'
+          ? formatTeacherName(currentAccount.fullName)
+          : currentAccount.fullName;
+
+      const newLog: AuditLogEntry = {
+        id: `log-${Date.now()}`,
+        action: auditAction,
+        category: 'ADMIN',
+        performedBy: actorName,
+        role: currentAccount.role,
+        details: auditDetails || '',
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      };
+      newDb.auditLogs = [newLog, ...(newDb.auditLogs || [])];
+      logAuditEvent(newLog).catch(() => {});
+    }
+
+    // 3. Save to backend immediately if online, or queue if offline
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      setSyncStatus('saving');
+      try {
+        await saveSchoolData(newDb);
+        localStorage.removeItem(PENDING_SYNC_KEY);
+        setSyncStatus('synced');
+        setLastSynced(new Date().toLocaleTimeString('ar-IQ'));
+      } catch (err) {
+        console.warn('Server sync error, queued offline:', err);
+        localStorage.setItem(PENDING_SYNC_KEY, 'true');
+        setSyncStatus('offline');
+      }
+    } else {
+      localStorage.setItem(PENDING_SYNC_KEY, 'true');
+      setSyncStatus('offline');
+    }
+  };
+
+  // Factory Reset: Completely zero out and reset all records to factory clean state
+  const factoryReset = async (): Promise<boolean> => {
     setSyncStatus('saving');
     try {
-      if (auditAction) {
-        const actorName =
-          currentAccount.role === 'TEACHER' || currentAccount.role === 'INSTRUCTOR'
-            ? formatTeacherName(currentAccount.fullName)
-            : currentAccount.fullName;
-
-        const newLog: AuditLogEntry = {
-          id: `log-${Date.now()}`,
-          action: auditAction,
-          category: 'ADMIN',
-          performedBy: actorName,
-          role: currentAccount.role,
-          details: auditDetails || '',
-          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        };
-        newDb.auditLogs = [newLog, ...(newDb.auditLogs || [])];
-        await logAuditEvent(newLog);
+      const res = await factoryResetSchoolData();
+      if (res.success && res.data) {
+        setDb(res.data);
+        localStorage.removeItem(PENDING_SYNC_KEY);
+        localStorage.setItem(OFFLINE_DB_KEY, JSON.stringify(res.data));
+        localStorage.setItem('madrasati_offline_backup', JSON.stringify(res.data));
+        setSyncStatus('synced');
+        setLastSynced(new Date().toLocaleTimeString('ar-IQ'));
+        return true;
       }
-
-      await saveSchoolData(newDb);
-      setSyncStatus('synced');
-      setLastSynced(new Date().toLocaleTimeString('ar-IQ'));
+      return false;
     } catch (err) {
-      console.error('Commit error:', err);
+      console.error('Factory reset failed:', err);
       setSyncStatus('error');
+      return false;
     }
   };
 
@@ -501,8 +637,10 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const updated = {
       ...db,
       teachers: db.teachers.filter((t) => t.id !== id),
+      accounts: (db.accounts || []).filter((a) => a.id !== id && a.phone !== target?.phone),
+      classes: db.classes.map((c) => c.supervisorId === id ? { ...c, supervisorId: '', supervisorName: '' } : c),
     };
-    await commitDbChange(updated, 'حذف تدريسي من السجلات', `تم حذف ${target ? formatTeacherName(target.name) : id}`);
+    await commitDbChange(updated, 'حذف معلم من السجلات', `تم حذف المعلم ${target ? formatTeacherName(target.name) : id}`);
   };
 
   // Student Management
@@ -534,6 +672,9 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const updated = {
       ...db,
       students: db.students.filter((s) => s.id !== id),
+      grades: db.grades.filter((g) => g.studentId !== id),
+      attendance: db.attendance.filter((a) => a.studentId !== id),
+      studentParentRelations: (db.studentParentRelations || []).filter((r) => r.studentId !== id),
     };
     await commitDbChange(updated, 'حذف سجل طالب', `شطب الطالب ${target ? target.fullName : id} من القيود المدرسية`);
   };
@@ -572,8 +713,23 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const updated = {
       ...db,
       classes: db.classes.filter((c) => c.id !== id),
+      timetables: db.timetables.filter((t) => {
+        if (t.classId && t.classId === id) return false;
+        if (target && t.gradeLevel === target.level && t.section === target.section) return false;
+        return true;
+      }),
     };
     await commitDbChange(updated, 'حذف شعبة دراسية', `حذف ${target ? `${target.level} (${target.section})` : id}`);
+  };
+
+  const deleteGrade = async (id: string) => {
+    if (!db || !canEditGrades) return;
+    const target = db.grades.find((g) => g.id === id);
+    const updated = {
+      ...db,
+      grades: db.grades.filter((g) => g.id !== id),
+    };
+    await commitDbChange(updated, 'مسح درجات مادة', `مسح سجل درجات المادة ${target ? target.subject : id}`);
   };
 
   // Helper to calculate consecutive absences for a student
@@ -1365,11 +1521,15 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         error,
         currentAccount,
         setCurrentAccount,
+        logout,
         switchRole,
         activeAcademicYear,
         setActiveAcademicYear,
         syncStatus,
         lastSynced,
+        isOnline,
+        factoryReset,
+        deleteGrade,
         canManageAccounts,
         canManageStaff,
         canEditClasses,

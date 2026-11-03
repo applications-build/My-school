@@ -23,6 +23,9 @@ import {
   User,
   KeyRound,
   FileSpreadsheet,
+  Wifi,
+  WifiOff,
+  RotateCcw,
 } from 'lucide-react';
 
 interface Props {
@@ -42,7 +45,7 @@ export const Header: React.FC<Props> = ({
   onLogout,
   onOpenRoleModal,
 }) => {
-  const { db, currentAccount, activeAcademicYear, setActiveAcademicYear } = useSchool();
+  const { db, currentAccount, activeAcademicYear, setActiveAcademicYear, isOnline, syncStatus, lastSynced } = useSchool();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const getRoleBadge = () => {
@@ -138,9 +141,48 @@ export const Header: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* Center: Current active page indicator for mobile */}
-            <div className="text-xs font-bold text-slate-700 bg-slate-100/80 px-2.5 py-1 rounded-lg truncate max-w-[120px] sm:max-w-none">
-              {menuItems.find((m) => m.id === activeTab)?.label || 'الصفحة'}
+            {/* Center: Current active page indicator + Online/Offline status pill */}
+            <div className="flex items-center gap-2">
+              <div className="text-xs font-bold text-slate-700 bg-slate-100/80 px-2.5 py-1 rounded-lg truncate max-w-[120px] sm:max-w-none">
+                {menuItems.find((m) => m.id === activeTab)?.label || 'الصفحة'}
+              </div>
+
+              {/* Real-time Online / Offline & Sync Indicator */}
+              <div
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors shadow-2xs ${
+                  !isOnline || syncStatus === 'offline'
+                    ? 'bg-amber-50 text-amber-800 border-amber-300'
+                    : syncStatus === 'saving'
+                    ? 'bg-blue-50 text-blue-800 border-blue-200 animate-pulse'
+                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                }`}
+                title={
+                  !isOnline || syncStatus === 'offline'
+                    ? 'يعمل التطبيق بدون اتصال بالإنترنت مع حفظ التغييرات محلياً ومزامنتها فور عودة الاتصال'
+                    : syncStatus === 'saving'
+                    ? 'جاري حفظ ومزامنة البيانات مع السيرفر السحابي...'
+                    : `متصل ومزامن لحظياً (آخر مزامنة: ${lastSynced})`
+                }
+              >
+                {!isOnline || syncStatus === 'offline' ? (
+                  <>
+                    <WifiOff className="w-3.5 h-3.5 text-amber-600" />
+                    <span className="hidden sm:inline">أوفلاين (حفظ محلي)</span>
+                    <span className="sm:hidden">أوفلاين</span>
+                  </>
+                ) : syncStatus === 'saving' ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
+                    <span className="hidden sm:inline">مزامنة...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    <span className="hidden sm:inline">متصل ومزامن</span>
+                    <span className="sm:hidden">متصل</span>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Left: Single Menu Icon Button */}
@@ -274,8 +316,20 @@ export const Header: React.FC<Props> = ({
               })}
             </div>
 
-            {/* Drawer Footer: Integrated Logout Button */}
+            {/* Drawer Footer: Integrated Quick Actions & Logout Button */}
             <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
+              {currentAccount.role === 'PRINCIPAL' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSelectTab('settings');
+                  }}
+                  className="w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 shadow-2xs"
+                >
+                  <RotateCcw className="w-4 h-4 text-amber-700" />
+                  <span>إعادة ضبط البيانات (إعادة ضبط المصنع)</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {

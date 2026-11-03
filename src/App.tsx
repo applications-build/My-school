@@ -32,9 +32,28 @@ import {
 } from 'lucide-react';
 
 function AppContent() {
-  const { loading, error, db } = useSchool();
-  const [showSplash, setShowSplash] = useState<boolean>(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { loading, error, db, logout } = useSchool();
+
+  // Persist session so page refresh doesn't log the user out
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      const session = localStorage.getItem('madrasati_auth_session');
+      return !!session;
+    } catch {
+      return false;
+    }
+  });
+
+  // Only show splash on fresh first load if user is not authenticated
+  const [showSplash, setShowSplash] = useState<boolean>(() => {
+    try {
+      const session = localStorage.getItem('madrasati_auth_session');
+      const seen = sessionStorage.getItem('madrasati_splash_seen');
+      if (session || seen) return false;
+    } catch {}
+    return true;
+  });
+
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [tabHistory, setTabHistory] = useState<string[]>(['dashboard']);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState<boolean>(false);
@@ -56,12 +75,20 @@ function AppContent() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    setIsAuthenticated(false);
+  };
+
   if (showSplash) {
     return (
       <SplashScreen
         appName="مدرستي"
-        schoolName={db?.schoolInfo?.name || 'مدرسة النور الابتدائية للبنين'}
-        onFinish={() => setShowSplash(false)}
+        schoolName={db?.schoolInfo?.name || 'مدرسة الرافدين النموذجية الابتدائية'}
+        onFinish={() => {
+          sessionStorage.setItem('madrasati_splash_seen', 'true');
+          setShowSplash(false);
+        }}
       />
     );
   }
@@ -115,7 +142,7 @@ function AppContent() {
         setActiveTab={navigateTo}
         canGoBack={tabHistory.length > 1}
         onBack={handleBack}
-        onLogout={() => setIsAuthenticated(false)}
+        onLogout={handleLogout}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
       />
 
@@ -124,7 +151,7 @@ function AppContent() {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={navigateTo}
-          onLogout={() => setIsAuthenticated(false)}
+          onLogout={handleLogout}
         />
 
         {/* Main Viewport Container */}

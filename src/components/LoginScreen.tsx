@@ -111,6 +111,10 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
         if (selectedRole === 'PRINCIPAL' && schoolName.trim() && db) {
           db.schoolInfo.name = schoolName.trim();
         }
+        try {
+          localStorage.setItem('madrasati_current_account', JSON.stringify(data.account));
+          localStorage.setItem('madrasati_auth_session', JSON.stringify({ account: data.account, timestamp: Date.now() }));
+        } catch {}
         setSuccessMessage('تم التحقق بنجاح! جاري الانتقال...');
         setTimeout(() => {
           setCurrentAccount(data.account);
@@ -135,6 +139,10 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
             status: 'ACTIVE',
             createdAt: new Date().toISOString(),
           };
+          try {
+            localStorage.setItem('madrasati_current_account', JSON.stringify(acc));
+            localStorage.setItem('madrasati_auth_session', JSON.stringify({ account: acc, timestamp: Date.now() }));
+          } catch {}
           setCurrentAccount(acc);
           onLoginSuccess();
           return;

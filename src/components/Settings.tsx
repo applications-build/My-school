@@ -22,6 +22,11 @@ import {
   FileCheck,
   HardDrive,
   History,
+  RotateCcw,
+  Trash2,
+  Wifi,
+  WifiOff,
+  AlertOctagon,
 } from 'lucide-react';
 
 export const Settings: React.FC = () => {
@@ -37,6 +42,10 @@ export const Settings: React.FC = () => {
     createNewAcademicYear,
     createIndependentBackup,
     restoreIndependentBackup,
+    factoryReset,
+    isOnline,
+    syncStatus,
+    lastSynced,
   } = useSchool();
 
   const [isAddYearOpen, setIsAddYearOpen] = useState(false);
@@ -50,6 +59,11 @@ export const Settings: React.FC = () => {
   const [backupNotesInput, setBackupNotesInput] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Factory reset modal state
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetConfirmInput, setResetConfirmInput] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
 
   // Notification Preference Toggles
   const currentPrefs = getUserNotificationPreferences(currentAccount?.id || 'u-principal');
@@ -118,6 +132,24 @@ export const Settings: React.FC = () => {
     setActionLoading(true);
     await restoreIndependentBackup(filename);
     setActionLoading(false);
+  };
+
+  const handleFactoryReset = async () => {
+    setResetLoading(true);
+    try {
+      const ok = await factoryReset();
+      if (ok) {
+        setIsResetModalOpen(false);
+        setResetConfirmInput('');
+        showStatus('تمت إعادة ضبط البيانات بنجاح! تم تصفير كافة السجلات إلى نقطة البداية النظيفة (حالة المصنع).');
+      } else {
+        showStatus('تعذر إكمال إعادة ضبط البيانات. يرجى المحاولة لاحقاً.');
+      }
+    } catch (err: any) {
+      showStatus('حدث خطأ أثناء تصفير البيانات: ' + (err.message || ''));
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   const showStatus = (msg: string) => {
@@ -497,6 +529,216 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Online / Offline Sync Status Engine */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+          <div>
+            <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+              {isOnline && syncStatus !== 'offline' ? (
+                <Wifi className="w-5 h-5 text-emerald-600" />
+              ) : (
+                <WifiOff className="w-5 h-5 text-amber-600" />
+              )}
+              <span>حالة الاتصال بالإنترنت والمزامنة اللحظية (Online / Offline Sync Engine)</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              يدعم النظام العمل بوضع متصل وغير متصل بالكامل مع حفظ فوري ومزامنة تلقائية مع قاعدة البيانات السحابية
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 shadow-2xs ${
+                !isOnline || syncStatus === 'offline'
+                  ? 'bg-amber-50 text-amber-800 border-amber-300'
+                  : syncStatus === 'saving'
+                  ? 'bg-blue-50 text-blue-800 border-blue-200 animate-pulse'
+                  : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              }`}
+            >
+              {!isOnline || syncStatus === 'offline' ? (
+                <>
+                  <WifiOff className="w-4 h-4 text-amber-600" />
+                  <span>الوضع غير المتصل (Offline - حفظ محلي نشط)</span>
+                </>
+              ) : syncStatus === 'saving' ? (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
+                  <span>جاري المزامنة مع قاعدة البيانات...</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                  <span>متصل ومزامن بالكامل (Online)</span>
+                </>
+              )}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="text-slate-500 font-bold mb-1">حالة اتصال الشبكة</div>
+            <div className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+              {isOnline ? (
+                <span className="text-emerald-700">متصل بالإنترنت</span>
+              ) : (
+                <span className="text-amber-700">بدون إنترنت (محلي)</span>
+              )}
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1">يراقب المتصفح والشبكة لحظياً</div>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="text-slate-500 font-bold mb-1">المزامنة مع الخادم</div>
+            <div className="text-sm font-extrabold text-slate-900">
+              {syncStatus === 'synced'
+                ? 'محفوظ ومزامن لحظياً'
+                : syncStatus === 'saving'
+                ? 'جاري الحفظ على الخادم...'
+                : 'مخزن محلياً بانتظار الاتصال'}
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1">تحديث لحظي بدون تأخير</div>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="text-slate-500 font-bold mb-1">آخر مزامنة ناجحة</div>
+            <div className="text-sm font-extrabold text-slate-900 font-mono">
+              {lastSynced || 'الآن'}
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1">حفظ دائم في قاعدة البيانات</div>
+          </div>
+        </div>
+
+        <div className="p-3.5 bg-emerald-50/60 border border-emerald-200 rounded-xl text-[11px] text-emerald-900 leading-relaxed">
+          💡 <strong>ثبات الجلسة والبيانات:</strong> يمكنك تحديث الصفحة (F5 / Refresh) في أي وقت دون تسجيل الخروج. عند مسح أي عنصر من قبل المدير يتم حذفه نهائياً من قاعدة البيانات على الخادم ومحوه من الذاكرة المحلية.
+        </div>
+      </div>
+
+      {/* Factory Reset: Danger Zone Card */}
+      <div className="bg-red-50/40 rounded-2xl border-2 border-red-200 p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-red-200">
+          <div>
+            <h3 className="font-bold text-base text-red-900 flex items-center gap-2">
+              <RotateCcw className="w-5 h-5 text-red-600" />
+              <span>إعادة ضبط البيانات (إعادة ضبط المصنع)</span>
+            </h3>
+            <p className="text-xs text-red-700 mt-0.5">
+              محو جميع البيانات المسجلة وتصفير السجلات وإرجاع النظام إلى نقطة البداية النظيفة كأول تشغيل للمدرسة
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setResetConfirmInput('');
+              setIsResetModalOpen(true);
+            }}
+            className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>إعادة ضبط البيانات</span>
+          </button>
+        </div>
+
+        <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
+          <p>
+            تتيح هذه الوظيفة لمدير المدرسة تصفير جميع البيانات المسجلة في النظام كلياً (إعادة ضبط المصنع)، حيث تشمل العملية:
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-slate-600 pr-2 text-[11px]">
+            <li>محو كافة الصفوف والشعب الدراسية.</li>
+            <li>محو جميع حسابات وسجلات الكادر التعليمي (المعلمين).</li>
+            <li>محو كافة سجلات التلاميذ وأولياء الأمور.</li>
+            <li>محو كافة سجلات الغياب والحضور والدرجات والامتحانات.</li>
+            <li>محو دفتر التحضير والواجبات البيتية والجدول الأسبوعي.</li>
+            <li>إبقاء معلومات المدرسة الأساسية وحساب المدير فقط كنقطة بداية نظيفة.</li>
+          </ul>
+        </div>
+
+        <div className="p-3 bg-red-100/80 border border-red-300 text-red-900 rounded-xl text-[11px] flex items-center gap-2 font-bold">
+          <AlertOctagon className="w-4 h-4 text-red-700 shrink-0" />
+          <span>تحذير: لا يمكن التراجع عن هذه العملية بعد التأكيد، وسيتم تصفير قاعدة بيانات الخادم ومحو التخزين المحلي فوراً.</span>
+        </div>
+      </div>
+
+      {/* Factory Reset Confirmation Modal */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl border border-red-300 max-w-lg w-full p-6 text-right space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-red-100 text-red-700">
+              <div className="p-2.5 bg-red-100 rounded-xl">
+                <AlertOctagon className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  تأكيد إعادة ضبط البيانات (إعادة ضبط المصنع)
+                </h3>
+                <p className="text-[11px] text-red-600 font-medium">
+                  إجراء حساس ومسؤول يتطلب تأكيد مدير المدرسة
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
+              <div className="p-3 bg-red-50 border border-red-200 text-red-900 rounded-xl text-[11px]">
+                ⚠️ أنت على وشك <strong>محو جميع البيانات</strong> من النظام وقاعدة البيانات السحابية كلياً، وتصفير جميع السجلات لحالة المصنع.
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-900 mb-1.5 text-xs">
+                  لتأكيد رغبتك بالمسح الشامل، يرجى كتابة كلمة <span className="text-red-600 font-black">"تصفير"</span> في الحقل أدناه:
+                </label>
+                <input
+                  type="text"
+                  value={resetConfirmInput}
+                  onChange={(e) => setResetConfirmInput(e.target.value)}
+                  placeholder='اكتب: تصفير'
+                  className="w-full px-3 py-2.5 bg-slate-50 border-2 border-red-200 focus:border-red-500 rounded-xl text-center text-sm font-bold text-red-700 focus:outline-none"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={resetLoading}
+                onClick={() => {
+                  setIsResetModalOpen(false);
+                  setResetConfirmInput('');
+                }}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              >
+                إلغاء وتراجع
+              </button>
+
+              <button
+                type="button"
+                disabled={resetConfirmInput.trim() !== 'تصفير' || resetLoading}
+                onClick={handleFactoryReset}
+                className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-xs transition-all flex items-center gap-2 ${
+                  resetConfirmInput.trim() === 'تصفير' && !resetLoading
+                    ? 'bg-red-600 hover:bg-red-700 active:scale-95 cursor-pointer'
+                    : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-60'
+                }`}
+              >
+                {resetLoading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>جاري تصفير البيانات...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    <span>تأكيد محو جميع البيانات وإعادة الضبط</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Year & Transition Modal */}
       {isAddYearOpen && (

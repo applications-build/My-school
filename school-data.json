@@ -1,200 +1,140 @@
 {
   "schoolInfo": {
-    "name": "مدرسة الرافدين الابتدائية",
-    "directorate": "المديرية العامة لتربية بغداد / الرصافة الأولى",
-    "principal": "علي محمد حسن",
-    "schoolCode": "IQ-BGD-2024-889",
+    "name": "مدرسة الرافدين النموذجية الابتدائية",
+    "directorate": "المديرية العامة لتربية بغداد",
+    "principal": "مدير المدرسة",
+    "schoolCode": "IQ-PRIM-001",
     "academicYear": "2024 - 2025",
     "semester": "الفصل الدراسي الأول",
     "phone": "07700000000",
-    "address": "بغداد - شارع فلسطين - محلة 505"
+    "address": "العراق"
   },
   "currentAcademicYear": "2024 - 2025",
   "availableYears": [
-    {
-      "id": "ay-2023",
-      "yearName": "2023 - 2024",
-      "startDate": "2023-09-15",
-      "endDate": "2024-06-30",
-      "status": "ARCHIVED",
-      "notes": "العام الدراسي السفير المكتمل"
-    },
     {
       "id": "ay-2024",
       "yearName": "2024 - 2025",
       "startDate": "2024-09-22",
       "endDate": "2025-06-30",
       "status": "ACTIVE",
-      "notes": "العام الدراسي الحالي والنشط"
-    },
-    {
-      "id": "ay-2025",
-      "yearName": "2025 - 2026",
-      "startDate": "2025-09-15",
-      "endDate": "2026-06-30",
-      "status": "PLANNED",
-      "notes": "عام الخطة المستقبلية"
+      "notes": "العام الدراسي الحالي"
     }
   ],
-  "classes": [
+  "accounts": [
     {
-      "id": "c-1",
-      "stage": "PRIMARY",
-      "level": "الصف السادس الابتدائي",
-      "section": "أ",
-      "supervisorId": "",
-      "studentCount": 0
-    },
-    {
-      "id": "c-2",
-      "stage": "PRIMARY",
-      "level": "الصف الخامس الابتدائي",
-      "section": "ب",
-      "supervisorId": "",
-      "studentCount": 0
-    }
-  ],
-  "teachers": [
-    {
-      "id": "t-1",
-      "name": "أ. علي حسين الكاظمي",
-      "fullName": "أ. علي حسين الكاظمي",
-      "type": "TEACHER",
-      "specialization": "قواعد اللغة العربية",
-      "phone": "07700000001",
-      "email": "teacher@iqschool.edu",
-      "classes": "الصف السادس الابتدائي - شعبة أ",
-      "weeklyQuotas": 16,
-      "employmentType": "ملاك دائم",
-      "appointmentDate": "2019-10-01",
-      "registrationNumber": "QD-2019-441",
-      "createdAt": "2024-09-15"
-    },
-    {
-      "id": "t-2",
-      "name": "أ. فاطمة كريم الأسدي",
-      "fullName": "أ. فاطمة كريم الأسدي",
-      "type": "TEACHER",
-      "specialization": "الرياضيات",
-      "phone": "07700000002",
-      "email": "fatima@iqschool.edu",
-      "classes": "الصف الخامس الابتدائي - شعبة أ",
-      "weeklyQuotas": 18,
-      "employmentType": "ملاك دائم",
-      "appointmentDate": "2020-11-15",
-      "registrationNumber": "QD-2020-582",
-      "createdAt": "2024-09-15"
-    },
-    {
-      "id": "t-3",
-      "name": "أ. أحمد جاسم كاظم",
-      "fullName": "أ. أحمد جاسم كاظم",
-      "type": "TEACHER",
-      "specialization": "العلوم",
-      "phone": "07801234561",
-      "email": "ahmed@iqschool.edu",
-      "classes": "الصف الرابع الابتدائي - شعبة أ",
-      "weeklyQuotas": 14,
-      "employmentType": "عقد",
-      "appointmentDate": "2022-09-20",
-      "registrationNumber": "QD-2022-809",
-      "createdAt": "2024-09-15"
-    }
-  ],
-  "students": [
-    {
-      "id": "st-1",
-      "fullName": "حيدر أحمد عباس",
-      "stage": "PRIMARY",
-      "gradeLevel": "الصف الرابع الابتدائي",
-      "section": "أ",
-      "parentName": "أحمد عباس جبر",
-      "parentPhone": "07705551122",
-      "birthDate": "2014-05-12",
-      "academicYear": "2024 - 2025",
-      "enrollmentNumber": "ST-2024-101",
-      "academicStatus": "ACTIVE"
-    },
-    {
-      "id": "st-2",
-      "fullName": "جعفر علي حيدر",
-      "stage": "PRIMARY",
-      "gradeLevel": "الصف الخامس الابتدائي",
-      "section": "أ",
-      "parentName": "علي حيدر عبد الحسين",
-      "parentPhone": "07701112233",
-      "birthDate": "2013-08-20",
-      "academicYear": "2024 - 2025",
-      "enrollmentNumber": "ST-2024-102",
-      "academicStatus": "ACTIVE"
-    },
-    {
-      "id": "st-3",
-      "fullName": "زينب محمد عبد الله",
-      "stage": "PRIMARY",
-      "gradeLevel": "الصف السادس الابتدائي",
-      "section": "أ",
-      "parentName": "محمد عبد الله العبيدي",
-      "parentPhone": "07700000003",
-      "birthDate": "2012-03-15",
-      "academicYear": "2024 - 2025",
-      "enrollmentNumber": "ST-2024-103",
-      "academicStatus": "ACTIVE"
-    }
-  ],
-  "attendance": [],
-  "grades": [],
-  "lessonPlans": [],
-  "timetables": [],
-  "auditLogs": [
-    {
-      "id": "log-init",
-      "action": "تهيئة السجلات الرسمية الخالية",
-      "category": "SYSTEM",
-      "performedBy": "إدارة المدرسة",
+      "id": "u-principal",
+      "fullName": "مدير المدرسة",
       "role": "PRINCIPAL",
-      "details": "تم إخلاء الأسماء والبيانات الافتراضية وتهيئة السجلات الحقيقية الخالية للعام الدراسي الجديد.",
-      "timestamp": "2024-11-01 00:00:00"
+      "email": "principal@iqschool.edu",
+      "phone": "07700000000",
+      "passwordHash": "123456",
+      "status": "ACTIVE",
+      "createdAt": "2024-09-15"
     }
   ],
-  "officialTemplates": [
+  "stages": [
     {
-      "id": "tmpl-student-cert-1",
-      "title": "تأييد وإفادة استمرار بالدراسة للطالب",
-      "category": "STUDENT_CERTIFICATE",
-      "issuingBody": "جمهورية العراق - وزارة التربية - المديرية العامة لتربية بغداد الرصافة الأولى",
-      "schoolName": "مدرسة الرافدين النموذجية",
-      "referenceNumberPrefix": "م.ر / 2024 / ",
-      "headerLayout": "تأييد رسمي صادق من إدارة المدرسة لمعاونة ولي الأمر والجهات الرسمية",
-      "footerLayout": "ختم وتوقيع إدارة المدرسة والجهة المشرفة",
-      "contentTemplate": "تشهد إدارة مدرسة الرافدين النموذجية بأن الطالب ({STUDENT_NAME}) المقيد برقم ({ENROLLMENT_NO}) مستمر بالدراسة في الصف ({GRADE_LEVEL}) الشعبة ({SECTION}) للعام الدراسي ({ACADEMIC_YEAR}).",
-      "orientation": "PORTRAIT",
-      "pageSize": "A4",
-      "isApproved": true,
-      "approvedBy": "مدير المدرسة",
-      "approvalDate": "2024-09-15",
-      "createdAt": "2024-09-15"
+      "id": "stg-1",
+      "name": "المرحلة الابتدائية",
+      "code": "PRIMARY",
+      "order": 1,
+      "requiresBranch": false
+    }
+  ],
+  "branches": [
+    {
+      "id": "br-4",
+      "name": "الفرع العام",
+      "code": "GENERAL",
+      "stageCode": "PRIMARY"
+    }
+  ],
+  "classes": [],
+  "subjects": [
+    {
+      "id": "sub-1",
+      "name": "التربية الإسلامية والقرآن الكريم",
+      "code": "ISL-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 2
     },
     {
-      "id": "tmpl-grades-matrix-1",
-      "title": "كشف الدرجات والسعي الفصلي الرسمي للشعبة",
-      "category": "GRADES_MATRIX",
-      "issuingBody": "جمهورية العراق - وزارة التربية - المديرية العامة لتربية بغداد الرصافة الأولى",
-      "schoolName": "مدرسة الرافدين النموذجية",
-      "referenceNumberPrefix": "ك.د / 2024 / ",
-      "headerLayout": "جدول معتمد لدرجات السعي والامتحانات الشهرية بنمط الوزارة",
-      "footerLayout": "توقيع لجنة الامتحانات والتدقيق ومدير المدرسة",
-      "contentTemplate": "جدول تفصيلي يتضمن الدرجات النهائية والنتائج لكل طالب بالشعبة مع نسب النجاح العامة.",
-      "orientation": "LANDSCAPE",
-      "pageSize": "A4",
-      "isApproved": true,
-      "approvedBy": "مدير المدرسة",
-      "approvalDate": "2024-09-15",
-      "createdAt": "2024-09-15"
+      "id": "sub-2",
+      "name": "قواعد اللغة العربية وقراءتي",
+      "code": "ARB-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 5
+    },
+    {
+      "id": "sub-3",
+      "name": "الرياضيات",
+      "code": "MTH-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 5
+    },
+    {
+      "id": "sub-4",
+      "name": "العلوم",
+      "code": "SCI-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 3
+    },
+    {
+      "id": "sub-5",
+      "name": "اللغة الإنكليزية",
+      "code": "ENG-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 3
+    },
+    {
+      "id": "sub-6",
+      "name": "الاجتماعيات",
+      "code": "SOC-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 2
+    },
+    {
+      "id": "sub-7",
+      "name": "التربية الفنية والنشيد",
+      "code": "ART-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 1
+    },
+    {
+      "id": "sub-8",
+      "name": "التربية الرياضية والصحية",
+      "code": "SPT-101",
+      "stage": "PRIMARY",
+      "weeklyHours": 1
     }
   ],
-  "subjects": [],
-  "specializations": [],
+  "specializations": [
+    {
+      "id": "sp-1",
+      "title": "اللغة العربية والتربية الإسلامية",
+      "category": "LANGUAGES"
+    },
+    {
+      "id": "sp-2",
+      "title": "الرياضيات",
+      "category": "SCIENCES"
+    },
+    {
+      "id": "sp-3",
+      "title": "العلوم العامة",
+      "category": "SCIENCES"
+    },
+    {
+      "id": "sp-4",
+      "title": "اللغة الإنكليزية",
+      "category": "LANGUAGES"
+    },
+    {
+      "id": "sp-5",
+      "title": "الاجتماعيات والوطنية",
+      "category": "HUMANITIES"
+    }
+  ],
   "curricula": [],
   "curriculumEditions": [
     {
@@ -448,307 +388,37 @@
       ]
     }
   ],
-  "subjectPlans": [
-    {
-      "id": "sp-ar6-a",
-      "curriculumEditionId": "cur-ed-ar-6",
-      "stage": "PRIMARY",
-      "gradeLevel": "الصف السادس الابتدائي",
-      "section": "أ",
-      "subjectName": "قواعد اللغة العربية",
-      "teacherId": "t-1",
-      "teacherName": "أ. علي حسين الكاظمي",
-      "academicYear": "2024 - 2025",
-      "targetCompletionDate": "2025-05-20",
-      "completedLessonIds": [
-        "les-ar6-101",
-        "les-ar6-102",
-        "les-ar6-103"
-      ],
-      "inProgressLessonId": "les-ar6-104",
-      "notes": "الإنجاز متسق مع الجدول الزمني الرسمي لمنهاج وزارة التربية",
-      "updatedAt": "2026-11-01"
-    },
-    {
-      "id": "sp-ar6-b",
-      "curriculumEditionId": "cur-ed-ar-6",
-      "stage": "PRIMARY",
-      "gradeLevel": "الصف السادس الابتدائي",
-      "section": "ب",
-      "subjectName": "قواعد اللغة العربية",
-      "teacherId": "t-1",
-      "teacherName": "أ. علي حسين الكاظمي",
-      "academicYear": "2024 - 2025",
-      "targetCompletionDate": "2025-05-20",
-      "completedLessonIds": [
-        "les-ar6-101",
-        "les-ar6-102"
-      ],
-      "inProgressLessonId": "les-ar6-103",
-      "notes": "تأخير بسيط بمقدار حصتين بسبب العطل الرسمية",
-      "updatedAt": "2026-11-01"
-    },
-    {
-      "id": "sp-ph6-a",
-      "curriculumEditionId": "cur-ed-ph-6",
-      "stage": "SECONDARY",
-      "gradeLevel": "الصف السادس العلمي",
-      "section": "أ",
-      "subjectName": "الفيزياء",
-      "teacherId": "t-2",
-      "teacherName": "أ. حسن سلمان الموسوي",
-      "academicYear": "2024 - 2025",
-      "targetCompletionDate": "2025-05-25",
-      "completedLessonIds": [
-        "les-ph6-101",
-        "les-ph6-102",
-        "les-ph6-103"
-      ],
-      "inProgressLessonId": "les-ph6-104",
-      "notes": "إنجاز الفصل الأول بالكامل وجاهزية لاختبار الشهر الأول",
-      "updatedAt": "2026-11-01"
-    }
-  ],
-  "lessonProgressLogs": [
-    {
-      "id": "log-les-1",
-      "subjectPlanId": "sp-ar6-a",
-      "lessonId": "les-ar6-101",
-      "chapterTitle": "الفصل الأول: النكرة والمعرفة والمعرب والمبني",
-      "lessonTitle": "النكرة والمعرفة",
-      "executedByTeacherId": "t-1",
-      "executedByTeacherName": "أ. علي حسين الكاظمي",
-      "gradeLevel": "الصف السادس الابتدائي",
-      "section": "أ",
-      "executionDate": "2024-10-02",
-      "periodsSpent": 3,
-      "notes": "تم حل التمارين وإعطاء واجب بيتي"
-    },
-    {
-      "id": "log-les-2",
-      "subjectPlanId": "sp-ar6-a",
-      "lessonId": "les-ar6-102",
-      "chapterTitle": "الفصل الأول: النكرة والمعرفة والمعرب والمبني",
-      "lessonTitle": "أنواع المعارف: المعرف بـ (أل) والعلوم",
-      "executedByTeacherId": "t-1",
-      "executedByTeacherName": "أ. علي حسين الكاظمي",
-      "gradeLevel": "الصف السادس الابتدائي",
-      "section": "أ",
-      "executionDate": "2024-10-10",
-      "periodsSpent": 4,
-      "notes": "شرح مستفيض وتطبيقات على السبورة"
-    }
-  ],
-  "examWeightConfigs": [
-    {
-      "id": "ew-primary",
-      "stageCode": "PRIMARY",
-      "dailyWeight": 10,
-      "monthlyWeight": 40,
-      "midYearWeight": 25,
-      "finalExamWeight": 25,
-      "oralPracticalWeight": 10,
-      "activityWeight": 10,
-      "maxGrade": 100,
-      "passingGrade": 50,
-      "roundingRule": "ROUND_HALF_UP",
-      "autoPassRemedialThreshold": 49.5
-    },
-    {
-      "id": "ew-intermediate",
-      "stageCode": "INTERMEDIATE",
-      "dailyWeight": 10,
-      "monthlyWeight": 30,
-      "midYearWeight": 30,
-      "finalExamWeight": 30,
-      "oralPracticalWeight": 10,
-      "activityWeight": 10,
-      "maxGrade": 100,
-      "passingGrade": 50,
-      "roundingRule": "ROUND_HALF_UP",
-      "autoPassRemedialThreshold": 49.5
-    },
-    {
-      "id": "ew-secondary",
-      "stageCode": "SECONDARY",
-      "dailyWeight": 10,
-      "monthlyWeight": 30,
-      "midYearWeight": 30,
-      "finalExamWeight": 30,
-      "oralPracticalWeight": 10,
-      "activityWeight": 10,
-      "maxGrade": 100,
-      "passingGrade": 50,
-      "roundingRule": "ROUND_HALF_UP",
-      "autoPassRemedialThreshold": 49.5
-    }
-  ],
-  "calculationRules": {
-    "passingMinGrade": 50,
-    "maxRemedialSubjectsCount": 3,
-    "allow49RoundingTo50": true,
-    "absentGradeValue": "ZERO",
-    "annualEffortFormula": "AVG_MONTHS"
-  },
-  "academicCalendarEvents": [
-    {
-      "id": "cal-1",
-      "title": "بدء العام الدراسي رسميًا",
-      "date": "2024-09-22",
-      "type": "SCHOOL_DAY",
-      "notes": "انطلاق الدوام الرسمي لجميع المراحل الدراسية"
-    },
-    {
-      "id": "cal-2",
-      "title": "عطلة رأس السنة الهجرية",
-      "date": "2024-07-08",
-      "type": "RELIGIOUS_HOLIDAY",
-      "notes": "عطلة رسمية لكافة المدارس"
-    },
-    {
-      "id": "cal-3",
-      "title": "امتحانات نصف السنة الدراسي",
-      "date": "2025-01-20",
-      "endDate": "2025-01-31",
-      "type": "EXAM_PERIOD",
-      "notes": "الامتحانات الشفهية والتحريرية لنصف السنة"
-    }
-  ],
-  "gradeAuditLogs": [],
-  "studentCumulativeRecords": [],
+  "subjectPlans": [],
+  "lessonProgressLogs": [],
+  "teachers": [],
+  "students": [],
   "parents": [],
   "studentParentRelations": [],
+  "attendance": [],
+  "grades": [],
   "homework": [],
-  "notifications": [],
-  "devicePushTokens": [],
-  "notificationPreferences": [],
-  "stages": [
+  "lessonPlans": [],
+  "timetables": [],
+  "notifications": [
     {
-      "id": "stg-1",
-      "name": "المرحلة الابتدائية",
-      "code": "PRIMARY",
-      "order": 1,
-      "requiresBranch": false
+      "id": "notif-welcome-1793711976916",
+      "title": "مرحباً بك في نظام مدرستي",
+      "body": "تم تشغيل الهيكلية المدرسية النظيفة بنجاح. النظام جاهز لإدخال الشعب والمعلمين والطلاب.",
+      "category": "SYSTEM",
+      "targetRole": "ALL",
+      "read": false,
+      "timestamp": "2026-11-03 13:19:36"
     }
   ],
-  "branches": [
+  "auditLogs": [
     {
-      "id": "br-1",
-      "name": "الفرع العلمي",
-      "code": "SCIENTIFIC",
-      "stageCode": "SECONDARY"
-    },
-    {
-      "id": "br-2",
-      "name": "الفرع الأدبي",
-      "code": "LITERARY",
-      "stageCode": "SECONDARY"
-    },
-    {
-      "id": "br-3",
-      "name": "الفرع المهني",
-      "code": "VOCATIONAL",
-      "stageCode": "SECONDARY"
-    },
-    {
-      "id": "br-4",
-      "name": "الفرع العام",
-      "code": "GENERAL",
-      "stageCode": "PRIMARY"
-    }
-  ],
-  "staffAllocations": [],
-  "studentTransfers": [],
-  "accounts": [
-    {
-      "id": "u-parent-1793624576650",
-      "fullName": "أحمد عباس جبر",
-      "role": "PARENT",
-      "email": "parent@iqschool.edu",
-      "phone": "07705551122",
-      "status": "ACTIVE",
-      "linkedStudentIds": [
-        "st-1"
-      ],
-      "createdAt": "2026-11-02",
-      "lastLogin": "2026-11-02 13:02:56"
-    },
-    {
-      "id": "u-principal",
-      "fullName": "علي محمد حسن",
+      "id": "log-init-1793711976916",
+      "action": "تهيئة السجلات الرسمية وتصفير البيانات",
+      "category": "SYSTEM",
+      "performedBy": "مدير المدرسة",
       "role": "PRINCIPAL",
-      "email": "principal@iqschool.edu",
-      "phone": "07701234567",
-      "passwordHash": "123456",
-      "status": "ACTIVE",
-      "createdAt": "2024-09-15",
-      "lastLogin": "2026-11-02 13:02:02"
-    },
-    {
-      "id": "t-1",
-      "fullName": "علي حسين الكاظمي",
-      "role": "TEACHER",
-      "email": "teacher@iqschool.edu",
-      "phone": "07700000001",
-      "passwordHash": "123456",
-      "status": "ACTIVE",
-      "assignedClassIds": [
-        "c-1",
-        "c-2"
-      ],
-      "assignedSubjects": [
-        "قواعد اللغة العربية",
-        "التربية الإسلامية"
-      ],
-      "createdAt": "2024-09-15",
-      "lastLogin": "2026-11-02 13:03:00"
-    },
-    {
-      "id": "t-2",
-      "fullName": "حسن سلمان الموسوي",
-      "role": "INSTRUCTOR",
-      "email": "instructor@iqschool.edu",
-      "phone": "07700000002",
-      "passwordHash": "123456",
-      "status": "ACTIVE",
-      "assignedClassIds": [
-        "c-3",
-        "c-4"
-      ],
-      "assignedSubjects": [
-        "الفيزياء",
-        "الكيمياء"
-      ],
-      "createdAt": "2024-09-15"
-    },
-    {
-      "id": "u-parent",
-      "fullName": "محمد عبد الله العبيدي",
-      "role": "PARENT",
-      "email": "parent@iqschool.edu",
-      "phone": "07700000003",
-      "passwordHash": "123456",
-      "status": "ACTIVE",
-      "linkedStudentIds": [],
-      "createdAt": "2024-09-15"
-    }
-  ],
-  "backupSnapshots": [
-    {
-      "id": "snap-1793529832406",
-      "filename": "madrasati_backup_2026-11-01T10-43-52-405Z.json",
-      "createdAt": "2026-11-01 10:43:52",
-      "academicYear": "2024 - 2025",
-      "sizeBytes": 22294,
-      "notes": "اختبار إنشاء نسخة احتياطية مستقلة من السيرفر",
-      "isAutoSnapshot": false,
-      "counts": {
-        "students": 0,
-        "teachers": 0,
-        "grades": 0,
-        "attendance": 0,
-        "lessonPlans": 0
-      }
+      "details": "تم بدء النظام كنسخة نظيفة خالية من أي بيانات افتراضية، بانتظار الإدخال الفعلي.",
+      "timestamp": "2026-11-03 13:19:36"
     }
   ]
 }

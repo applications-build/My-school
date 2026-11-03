@@ -448,6 +448,7 @@ export interface AcademicCalendarEvent {
 
 export interface TimetableEntry {
   id: string;
+  classId?: string;
   day: 'الأحد' | 'الإثنين' | 'الثلاثاء' | 'الأربعاء' | 'الخميس';
   period: number; // 1 to 6
   gradeLevel: string;

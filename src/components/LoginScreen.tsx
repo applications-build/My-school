@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useSchool, DEMO_ACCOUNTS } from '../context/SchoolContext';
-import { AccountType, formatTeacherName } from '../types';
-import { ShieldCheck, GraduationCap, UserCheck, Users, LogIn, Lock, Mail, AlertCircle } from 'lucide-react';
+import { useSchool } from '../context/SchoolContext';
+import { AccountType, formatTeacherName, UserAccount } from '../types';
+import { ShieldCheck, GraduationCap, Users, LogIn, Lock, Phone, User, Building, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface Props {
   onLoginSuccess: () => void;
@@ -9,144 +9,226 @@ interface Props {
 
 export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
   const { setCurrentAccount, db } = useSchool();
-  const [selectedRole, setSelectedRole] = useState<AccountType>('PRINCIPAL');
-  const [email, setEmail] = useState('principal@iqschool.edu');
+  const [selectedRole, setSelectedRole] = useState<'PRINCIPAL' | 'TEACHER' | 'PARENT'>('PRINCIPAL');
+  
+  // Fields
+  const [fullName, setFullName] = useState('علي محمد حسن');
+  const [phone, setPhone] = useState('07701234567');
   const [password, setPassword] = useState('123456');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetSuccess, setResetSuccess] = useState('');
+  const [schoolName, setSchoolName] = useState(db?.schoolInfo?.name || 'مدرسة النور الابتدائية للبنين');
+  const [studentName, setStudentName] = useState('حيدر أحمد عباس');
 
-  const handleRoleSelect = (role: AccountType) => {
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRoleSelect = (role: 'PRINCIPAL' | 'TEACHER' | 'PARENT') => {
     setSelectedRole(role);
-    const accList = db?.accounts || [];
-    const foundAcc = accList.find((a) => a.role === role);
-    if (foundAcc) {
-      setEmail(foundAcc.email);
-    } else {
-      const demoAcc = DEMO_ACCOUNTS[role];
-      setEmail(demoAcc.email);
-    }
     setErrorMessage('');
+    setSuccessMessage('');
+
+    if (role === 'PRINCIPAL') {
+      const pAcc = db?.accounts?.find((a) => a.role === 'PRINCIPAL');
+      setFullName(pAcc?.fullName || 'علي محمد حسن');
+      setPhone(pAcc?.phone || '07701234567');
+      setPassword('123456');
+      setSchoolName(db?.schoolInfo?.name || 'مدرسة النور الابتدائية للبنين');
+    } else if (role === 'TEACHER') {
+      const firstTeacher = db?.teachers?.[0];
+      setFullName(firstTeacher ? formatTeacherName(firstTeacher.fullName || firstTeacher.name) : 'أحمد جاسم كاظم');
+      setPhone(firstTeacher?.phone || '07801234561');
+      setPassword('');
+    } else if (role === 'PARENT') {
+      const firstStudent = db?.students?.[0];
+      setFullName(firstStudent?.parentName || 'أحمد عباس جبر');
+      setPhone(firstStudent?.parentPhone || '07705551122');
+      setStudentName(firstStudent?.fullName || 'حيدر أحمد عباس');
+      setPassword('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
 
-    if (!email.trim()) {
-      setErrorMessage('يرجى إدخال اسم المستخدم أو البريد الإلكتروني');
+    if (!fullName.trim()) {
+      setErrorMessage('يرجى إدخال الاسم الثلاثي كاملاً');
       return;
     }
-    if (password.length < 4) {
-      setErrorMessage('كلمة المرور يجب أن تتكون من 4 خانات على الأقل');
+    if (!phone.trim()) {
+      setErrorMessage('يرجى إدخال رقم هاتف مفعّل به واتساب للتواصل المدرسي');
       return;
+    }
+
+    if (selectedRole === 'PRINCIPAL') {
+      if (!schoolName.trim()) {
+        setErrorMessage('يرجى كتابة اسم المدرسة الابتدائية');
+        return;
+      }
+      if (!password || password.length < 4) {
+        setErrorMessage('كلمة المرور يجب ألا تقل عن 4 رموز');
+        return;
+      }
+    }
+
+    if (selectedRole === 'PARENT') {
+      if (!studentName.trim()) {
+        setErrorMessage('يرجى كتابة اسم التلميذ الثلاثي كما هو مسجل في المدرسة');
+        return;
+      }
     }
 
     setIsSubmitting(true);
     try {
+      const payload: any = {
+        role: selectedRole,
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+      };
+
+      if (selectedRole === 'PRINCIPAL') {
+        payload.password = password;
+        payload.schoolName = schoolName.trim();
+      } else if (selectedRole === 'PARENT') {
+        payload.studentName = studentName.trim();
+      }
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        setErrorMessage(data.error || 'فشلت عملية تسجيل الدخول. يرجى التحقق من البيانات.');
+        setErrorMessage(data.error || 'تعذر تسجيل الدخول. يرجى التأكد من صحة البيانات.');
         setIsSubmitting(false);
         return;
       }
 
       if (data.account) {
-        setCurrentAccount(data.account);
-        setIsSubmitting(false);
-        onLoginSuccess();
+        if (selectedRole === 'PRINCIPAL' && schoolName.trim() && db) {
+          db.schoolInfo.name = schoolName.trim();
+        }
+        setSuccessMessage('تم التحقق بنجاح! جاري الانتقال...');
+        setTimeout(() => {
+          setCurrentAccount(data.account);
+          setIsSubmitting(false);
+          onLoginSuccess();
+        }, 300);
       }
     } catch (err) {
-      // Offline fallback
-      const accList = db?.accounts || [];
-      const found = accList.find((a) => a.email.toLowerCase() === email.toLowerCase().trim());
-      if (found) {
-        if (found.status === 'SUSPENDED') {
-          setErrorMessage('حسابك موقوف بقرار إداري من إدارة المدرسة.');
+      // Offline fallback handling
+      console.warn('Offline login verification', err);
+      if (selectedRole === 'PRINCIPAL') {
+        if (password === '123456' || password.length >= 4) {
+          if (schoolName.trim() && db) {
+            db.schoolInfo.name = schoolName.trim();
+          }
+          const acc: UserAccount = db?.accounts?.find((a) => a.role === 'PRINCIPAL') || {
+            id: 'acc-principal-1',
+            fullName: fullName.trim(),
+            email: 'principal@iqschool.edu',
+            phone: phone.trim(),
+            role: 'PRINCIPAL',
+            status: 'ACTIVE',
+            createdAt: new Date().toISOString(),
+          };
+          setCurrentAccount(acc);
+          onLoginSuccess();
+          return;
+        } else {
+          setErrorMessage('كلمة المرور غير صحيحة.');
           setIsSubmitting(false);
           return;
         }
-        setCurrentAccount(found);
-        setIsSubmitting(false);
-        onLoginSuccess();
-        return;
       }
 
-      // Fallback to DEMO_ACCOUNTS
-      const demo = DEMO_ACCOUNTS[selectedRole];
-      setCurrentAccount(demo);
+      if (selectedRole === 'TEACHER') {
+        const found = db?.teachers?.find(
+          (t) =>
+            (t.fullName?.trim().toLowerCase() === fullName.trim().toLowerCase() ||
+             t.name?.trim().toLowerCase() === fullName.trim().toLowerCase()) &&
+            t.phone.trim() === phone.trim()
+        );
+        if (found) {
+          const acc: UserAccount = db?.accounts?.find((a) => a.phone === found.phone || a.fullName === found.fullName) || {
+            id: 'acc-teacher-' + found.id,
+            fullName: formatTeacherName(found.fullName || found.name),
+            email: found.email,
+            phone: found.phone,
+            role: 'TEACHER',
+            assignedSubjects: [found.specialization],
+            status: 'ACTIVE',
+            createdAt: new Date().toISOString(),
+          };
+          setCurrentAccount(acc);
+          onLoginSuccess();
+          return;
+        } else {
+          setErrorMessage('لم يتم العثور على أستاذ مسجل بهذا الاسم ورقم الهاتف في كادر المدرسة.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      if (selectedRole === 'PARENT') {
+        const foundStudent = db?.students?.find(
+          (s) => s.fullName.trim().toLowerCase() === studentName.trim().toLowerCase()
+        );
+        if (foundStudent) {
+          const acc: UserAccount = {
+            id: 'acc-parent-' + foundStudent.id,
+            fullName: fullName.trim(),
+            email: 'parent.' + foundStudent.id + '@iqschool.edu',
+            phone: phone.trim(),
+            role: 'PARENT',
+            linkedStudentIds: [foundStudent.id],
+            status: 'ACTIVE',
+            createdAt: new Date().toISOString(),
+          };
+          setCurrentAccount(acc);
+          onLoginSuccess();
+          return;
+        } else {
+          setErrorMessage('لم يتم العثور على تلميذ مسجل بهذا الاسم الثلاثي في المدرسة.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       setIsSubmitting(false);
-      onLoginSuccess();
     }
   };
 
-  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resetEmail.trim()) return;
-
-    try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resetEmail.trim(), newPassword: '123456' }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setResetSuccess('تم إعادة تعيين كلمة المرور إلى (123456) بنجاح. يمكنك الآن تسجيل الدخول بها.');
-      } else {
-        setResetSuccess(data.error || 'تعذر العثور على البريد الإلكتروني.');
-      }
-    } catch {
-      setResetSuccess('حدث خطأ أثناء الاتصال بالنظام.');
-    }
-  };
-
-  const roleConfigs: {
-    type: AccountType;
-    title: string;
-    sub: string;
-    icon: React.ReactNode;
-  }[] = [
+  const roleConfigs = [
     {
-      type: 'PRINCIPAL',
+      type: 'PRINCIPAL' as const,
       title: 'مدير المدرسة',
-      sub: 'إدارة شاملة، اعتماد، وتدقيق',
+      sub: 'إدارة، اعتماد، وضبط المدرسة',
       icon: <ShieldCheck className="w-5 h-5 text-indigo-600" />,
     },
     {
-      type: 'TEACHER',
-      title: 'معلم (ابتدائي)',
-      sub: 'حضور ودرجات المرحلة الابتدائية',
+      type: 'TEACHER' as const,
+      title: 'الأستاذ / المعلم',
+      sub: 'تحضير الدروس ورصد الدرجات',
       icon: <GraduationCap className="w-5 h-5 text-emerald-600" />,
     },
     {
-      type: 'INSTRUCTOR',
-      title: 'مدرّس (متوسط/إعدادي)',
-      sub: 'درجات وسعي ودروس تخصصية',
-      icon: <UserCheck className="w-5 h-5 text-blue-600" />,
-    },
-    {
-      type: 'PARENT',
-      title: 'ولي أمر طالب',
-      sub: 'متابعة البطاقة وتنبيهات الغياب',
+      type: 'PARENT' as const,
+      title: 'ولي أمر التلميذ',
+      sub: 'متابعة الدفتر والدرجات والغياب',
       icon: <Users className="w-5 h-5 text-amber-600" />,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 flex items-center justify-center p-4 text-right">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 flex items-center justify-center p-3 sm:p-4 text-right">
       <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300">
         
         {/* Top Header Card */}
-        <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 text-center relative">
+        <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-5 sm:p-6 text-center relative">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md p-1 border border-white/20 mx-auto mb-3 shadow-lg flex items-center justify-center">
             <img
               src="/assets/aistudio/image_a8766003.png"
@@ -155,19 +237,24 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
             />
           </div>
           <h2 className="text-xl font-extrabold tracking-tight">نظام مدرستي الرقمي</h2>
-          <p className="text-xs text-emerald-100/80 mt-1">
-            تسجيل الدخول الآمن للمدرسة العراقية
+          <p className="text-xs text-emerald-100/90 mt-1 font-medium">
+            بوابة الإدارة الابتدائية الذكية الموحدة
           </p>
+          {db?.schoolInfo?.name && (
+            <div className="inline-block mt-2 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-[11px] font-bold text-emerald-100 border border-white/20">
+              {db.schoolInfo.name}
+            </div>
+          )}
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-5 sm:p-6 space-y-4">
           {/* Role selector chips */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-2">
-              حدد نوع الحساب لتسجيل الدخول:
+              اختر صفة الدخول:
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {roleConfigs.map((rc) => {
                 const isSelected = selectedRole === rc.type;
                 return (
@@ -175,27 +262,34 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
                     key={rc.type}
                     type="button"
                     onClick={() => handleRoleSelect(rc.type)}
-                    className={`p-2.5 rounded-xl border text-right transition-all flex items-center gap-2.5 ${
+                    className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold ring-2 ring-emerald-600/20'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-600/20 shadow-xs'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    <div className="p-1.5 rounded-lg bg-white shadow-2xs border border-slate-200/60 shrink-0">
+                    <div className="p-1.5 rounded-xl bg-white shadow-2xs border border-slate-200/60 shrink-0">
                       {rc.icon}
                     </div>
-                    <div>
-                      <div className="text-xs font-bold leading-tight">{rc.title}</div>
-                      <div className="text-[10px] text-slate-500 line-clamp-1">{rc.sub}</div>
-                    </div>
+                    <div className="text-[11px] font-bold leading-tight">{rc.title}</div>
                   </button>
                 );
               })}
             </div>
           </div>
 
+          {/* Quick Notice for Role Requirements */}
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 leading-relaxed flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>
+              {selectedRole === 'PRINCIPAL' && 'للمدير: أدخل اسمك ورقم هاتفك وكلمة السر واسم مدرستك لحفظه بالنظام.'}
+              {selectedRole === 'TEACHER' && 'للأستاذ: اكتب اسمك الثلاثي ورقم هاتفك المسجلين لدى الإدارة لتسجيل الدخول الفوري.'}
+              {selectedRole === 'PARENT' && 'لولي الأمر: اكتب اسمك ورقمك واسم ابنك التلميذ الثلاثي للربط بسجل درجاته وحضوره.'}
+            </span>
+          </div>
+
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
             {errorMessage && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
@@ -203,57 +297,113 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
               </div>
             )}
 
+            {successMessage && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{successMessage}</span>
+              </div>
+            )}
+
+            {/* School Name (for Principal only) */}
+            {selectedRole === 'PRINCIPAL' && (
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">اسم المدرسة الابتدائية:</label>
+                <div className="relative">
+                  <Building className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                    placeholder="مثال: مدرسة النور الابتدائية للبنين"
+                    className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Full Name */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">البريد الإلكتروني أو اسم المستخدم:</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                {selectedRole === 'PRINCIPAL' && 'الاسم الثلاثي لمدير المدرسة:'}
+                {selectedRole === 'TEACHER' && 'الاسم الثلاثي للأستاذ / المعلم:'}
+                {selectedRole === 'PARENT' && 'الاسم الثلاثي لولي الأمر:'}
+              </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@iqschool.edu"
-                  className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-mono"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="الاسم الثلاثي واللقب"
+                  className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs"
                 />
               </div>
             </div>
 
+            {/* Student Name (for Parent only) */}
+            {selectedRole === 'PARENT' && (
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">اسم الابن / التلميذ الثلاثي المسجل بالمدرسة:</label>
+                <div className="relative">
+                  <GraduationCap className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    placeholder="مثال: حيدر أحمد عباس"
+                    className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Phone Number (WhatsApp enabled) */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">كلمة المرور الحصينة:</label>
+              <label className="block font-bold text-slate-700 mb-1">
+                رقم الهاتف (مفعّل به واتساب):
+              </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                <Phone className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
                 <input
-                  type="password"
+                  type="tel"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-mono"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="07XXXXXXXXX"
+                  dir="ltr"
+                  className="w-full pl-3 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-mono text-right"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setResetEmail(email);
-                  setResetSuccess('');
-                  setShowResetModal(true);
-                }}
-                className="text-[11px] font-bold text-emerald-800 hover:underline"
-              >
-                نسيت كلمة المرور؟
-              </button>
-            </div>
+            {/* Password (for Principal only) */}
+            {selectedRole === 'PRINCIPAL' && (
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">كلمة المرور الإدارية:</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 text-xs font-mono"
+                  />
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
             >
               {isSubmitting ? (
-                <span>جاري المصادقة والدخول...</span>
+                <span>جاري التحقق والدخول...</span>
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
@@ -263,69 +413,11 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-100 text-center text-[11px] text-slate-500 leading-relaxed">
-            نظام «مدرستي» يضمن التحكم بالوصول والحفاظ على سرية البيانات طوال السنة الدراسية.
+          <div className="pt-2 border-t border-slate-100 text-center text-[10px] text-slate-500 leading-relaxed">
+            تسجيل آمن وسريع عبر الهواتف الذكية مع الربط التلقائي بسجلات المدرسة الابتدائية.
           </div>
         </div>
       </div>
-
-      {/* Forgot Password Modal */}
-      {showResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full p-6 text-right space-y-4">
-            <h3 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-indigo-700" />
-              <span>استعادة وطلب كلمة المرور</span>
-            </h3>
-
-            {resetSuccess ? (
-              <div className="space-y-3">
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
-                  {resetSuccess}
-                </div>
-                <button
-                  onClick={() => setShowResetModal(false)}
-                  className="w-full py-2 bg-emerald-700 text-white font-bold text-xs rounded-xl"
-                >
-                  العودة لتسجيل الدخول
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleResetPasswordSubmit} className="space-y-3 text-xs">
-                <p className="text-slate-600 leading-relaxed">
-                  أدخل البريد الإلكتروني المسجل لإعادة تعيين كلمة المرور آلياً أو إرسال طلب لإدارة المدرسة:
-                </p>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">البريد الإلكتروني:</label>
-                  <input
-                    type="email"
-                    required
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowResetModal(false)}
-                    className="px-3 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-xl shadow-xs"
-                  >
-                    إعادة تعيين كلمة المرور
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

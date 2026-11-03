@@ -43,7 +43,7 @@ export const CurriculumManager: React.FC = () => {
     logLessonProgress,
   } = useSchool();
 
-  const [activeTab, setActiveTab] = useState<'database' | 'entry' | 'plans' | 'dashboard'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'plans' | 'dashboard'>('dashboard');
 
   // Filters for Database view
   const [selectedStage, setSelectedStage] = useState<string>('ALL');
@@ -223,7 +223,7 @@ export const CurriculumManager: React.FC = () => {
     // Reset Form
     setNewSubjectName('');
     setNewBookTitle('');
-    setActiveTab('database');
+    setActiveTab('dashboard');
   };
 
   // Import Ministry Bulk Simulation
@@ -259,7 +259,7 @@ export const CurriculumManager: React.FC = () => {
     ];
 
     await importCurriculumEditions(imported);
-    setActiveTab('database');
+    setActiveTab('dashboard');
   };
 
   // Submit Subject Plan
@@ -315,18 +315,9 @@ export const CurriculumManager: React.FC = () => {
 
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {isPrincipal && (
-              <button
-                onClick={() => setActiveTab('entry')}
-                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
-              >
-                <Plus className="w-4 h-4" />
-                <span>إضافة منهج رسمي</span>
-              </button>
-            )}
             <button
               onClick={() => setIsPlanModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-bold transition-all active:scale-95 backdrop-blur-md"
+              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
             >
               <Calendar className="w-4 h-4" />
               <span>تخصيص خطة مادة لشعبة</span>
@@ -350,18 +341,6 @@ export const CurriculumManager: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('database')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-            activeTab === 'database'
-              ? 'bg-emerald-700 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          <span>قاعدة المناهج والإصدارات ({editions.length})</span>
-        </button>
-
-        <button
           onClick={() => setActiveTab('plans')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === 'plans'
@@ -372,20 +351,6 @@ export const CurriculumManager: React.FC = () => {
           <Layers className="w-4 h-4" />
           <span>الخطط الدراسية للشعب ({subjectPlans.length})</span>
         </button>
-
-        {isPrincipal && (
-          <button
-            onClick={() => setActiveTab('entry')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'entry'
-                ? 'bg-emerald-700 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Plus className="w-4 h-4" />
-            <span>إدخال واستيراد المناهج</span>
-          </button>
-        )}
       </div>
 
       {/* TAB 1: SYLLABUS COMPLETION DASHBOARD */}
@@ -609,164 +574,7 @@ export const CurriculumManager: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: TEXTBOOKS & EDITIONS DATABASE */}
-      {activeTab === 'database' && (
-        <div className="space-y-6">
-          {/* Search & Stage Filter Bar */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 flex-1 max-w-md bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
-              <Search className="w-4 h-4 text-slate-400 shrink-0" />
-              <input
-                type="text"
-                placeholder="ابحث برقم الطبعة، اسم المادة، أو الصف..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none text-xs text-slate-900 focus:outline-none w-full"
-              />
-            </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto">
-              <span className="text-xs font-bold text-slate-500 whitespace-nowrap">تصفية حسب المرحلة:</span>
-              <button
-                onClick={() => setSelectedStage('ALL')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedStage === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                الكل
-              </button>
-              <button
-                onClick={() => setSelectedStage('PRIMARY')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedStage === 'PRIMARY' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                المرحلة الابتدائية
-              </button>
-              <button
-                onClick={() => setSelectedStage('INTERMEDIATE')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedStage === 'INTERMEDIATE' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                المرحلة المتوسطة
-              </button>
-              <button
-                onClick={() => setSelectedStage('SECONDARY')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedStage === 'SECONDARY' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                المرحلة الإعدادية
-              </button>
-            </div>
-          </div>
-
-          {/* Editions Grid */}
-          <div className="space-y-4">
-            {filteredEditions.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
-                <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs font-bold text-slate-600">لم يتم العثور على مناهج مطابقة للمحددات.</p>
-              </div>
-            ) : (
-              filteredEditions.map((edition) => {
-                const isExpanded = expandedEditionId === edition.id;
-                return (
-                  <div key={edition.id} className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                    <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-base font-bold text-slate-900">{edition.bookTitle}</h3>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200">
-                            {edition.editionNumber}
-                          </span>
-                          <span
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              edition.status === 'ACTIVE'
-                                ? 'bg-emerald-500 text-white'
-                                : edition.status === 'PREVIOUS'
-                                ? 'bg-amber-500 text-white'
-                                : 'bg-slate-500 text-white'
-                            }`}
-                          >
-                            {edition.status === 'ACTIVE' ? 'طبعة فعالة حالياً' : edition.status === 'PREVIOUS' ? 'طبعة سابقة متبناة' : 'طبعة مؤرشفة'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 font-medium flex items-center gap-3">
-                          <span>المصدر الرسمى: {edition.issuingBody}</span>
-                          <span>• الصف: {edition.gradeLevel}</span>
-                          <span>• السنة الدراسية: {edition.academicYear}</span>
-                          {edition.totalPages && <span>• عدد الصفحات: {edition.totalPages} صفحة</span>}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {edition.pdfUrl && (
-                          <a
-                            href={edition.pdfUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all"
-                          >
-                            <FileText className="w-3.5 h-3.5 text-rose-600" />
-                            <span>معاينة الكتاب PDF</span>
-                          </a>
-                        )}
-                        <button
-                          onClick={() => setExpandedEditionId(isExpanded ? null : edition.id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all"
-                        >
-                          <span>{isExpanded ? 'إخفاء الفصول' : 'عرض الفصول والدروس'}</span>
-                          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Expanded Chapter Tree */}
-                    {isExpanded && (
-                      <div className="p-5 bg-slate-50/70 border-t border-slate-100 space-y-4">
-                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-emerald-700" />
-                          <span>هيكلية الفصول والدروس المقررة ({edition.chapters?.length || 0} فصل)</span>
-                        </h4>
-
-                        <div className="space-y-3">
-                          {(edition.chapters || []).map((ch) => (
-                            <div key={ch.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                              <h5 className="font-bold text-xs text-slate-900 mb-2 border-b border-slate-100 pb-2">
-                                {ch.title}
-                              </h5>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {(ch.lessons || []).map((les) => (
-                                  <div
-                                    key={les.id}
-                                    className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs"
-                                  >
-                                    <div className="font-semibold text-slate-800">
-                                      م{les.lessonNumber}: {les.title}
-                                    </div>
-                                    <div className="flex items-center gap-2 text-[11px] text-slate-500 font-bold shrink-0">
-                                      <span>ص {les.pageNumber || '-'}</span>
-                                      <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                                        {les.estimatedPeriods} حصص
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
 
       {/* TAB 3: SUBJECT PLANS */}
       {activeTab === 'plans' && (
@@ -832,250 +640,7 @@ export const CurriculumManager: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 4: CURRICULUM ENTRY & BULK IMPORT */}
-      {activeTab === 'entry' && isPrincipal && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Manual Entry Form */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-emerald-700" />
-                <span>إضافة منهج رسمي جديد (وزارة التربية العراقية)</span>
-              </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                أدخل تفاصيل الكتاب الطبعة لسنة الاعتماد بدون مسح أي طبعات سابقة
-              </p>
-            </div>
 
-            <form onSubmit={handleSaveEdition} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">اسم المادة الدراسية *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثل: الفيزياء، قواعد اللغة العربية..."
-                    value={newSubjectName}
-                    onChange={(e) => setNewSubjectName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">اسم الكتاب الرسمي الكامل *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثل: الفيزياء للصف السادس العلمي..."
-                    value={newBookTitle}
-                    onChange={(e) => setNewBookTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">المرحلة الدراسية</label>
-                  <select
-                    value={newStage}
-                    onChange={(e) => setNewStage(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  >
-                    <option value="PRIMARY">المرحلة الابتدائية</option>
-                    <option value="INTERMEDIATE">المرحلة المتوسطة</option>
-                    <option value="SECONDARY">المرحلة الإعدادية</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">الصف الدراسي</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثل: السادس الابتدائي..."
-                    value={newGradeLevel}
-                    onChange={(e) => setNewGradeLevel(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">الفرع الدراسي</label>
-                  <select
-                    value={newBranch}
-                    onChange={(e) => setNewBranch(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  >
-                    <option value="GENERAL">عام</option>
-                    <option value="SCIENTIFIC">الفرع العلمي</option>
-                    <option value="LITERARY">الفرع الأدبي</option>
-                    <option value="VOCATIONAL">الفرع المهني</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">رقم الطبعة ووصفها</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثل: الطبعة الثامنة 2024 (المعدلة)"
-                    value={newEditionNumber}
-                    onChange={(e) => setNewEditionNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">سنة الإصدار</label>
-                  <input
-                    type="text"
-                    value={newEditionYear}
-                    onChange={(e) => setNewEditionYear(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">عدد الصفحات</label>
-                  <input
-                    type="number"
-                    value={newTotalPages}
-                    onChange={(e) => setNewTotalPages(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
-                  />
-                </div>
-              </div>
-
-              {/* Dynamic Chapter Builder */}
-              <div className="border-t border-slate-200 pt-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-800">بناء الفصول والدروس المقررة</h4>
-                  <button
-                    type="button"
-                    onClick={handleAddChapter}
-                    className="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg text-xs font-bold transition-all"
-                  >
-                    + إضافة فصل جديد
-                  </button>
-                </div>
-
-                {formChapters.map((ch, chIdx) => (
-                  <div key={chIdx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                    <input
-                      type="text"
-                      value={ch.title}
-                      onChange={(e) => {
-                        const updated = [...formChapters];
-                        updated[chIdx].title = e.target.value;
-                        setFormChapters(updated);
-                      }}
-                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900"
-                    />
-
-                    <div className="space-y-2">
-                      {ch.lessons.map((les, lIdx) => (
-                        <div key={lIdx} className="flex items-center gap-2 text-xs">
-                          <input
-                            type="text"
-                            placeholder="عنوان الدرس"
-                            value={les.title}
-                            onChange={(e) => {
-                              const updated = [...formChapters];
-                              updated[chIdx].lessons[lIdx].title = e.target.value;
-                              setFormChapters(updated);
-                            }}
-                            className="flex-1 px-3 py-1 bg-white border border-slate-200 rounded-lg font-medium"
-                          />
-                          <input
-                            type="number"
-                            placeholder="رقم الصفحة"
-                            value={les.pageNumber}
-                            onChange={(e) => {
-                              const updated = [...formChapters];
-                              updated[chIdx].lessons[lIdx].pageNumber = Number(e.target.value);
-                              setFormChapters(updated);
-                            }}
-                            className="w-20 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center"
-                          />
-                          <input
-                            type="number"
-                            placeholder="الحصص المقررة"
-                            value={les.estimatedPeriods}
-                            onChange={(e) => {
-                              const updated = [...formChapters];
-                              updated[chIdx].lessons[lIdx].estimatedPeriods = Number(e.target.value);
-                              setFormChapters(updated);
-                            }}
-                            className="w-24 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-emerald-800"
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddLesson(chIdx)}
-                      className="text-[11px] font-bold text-emerald-700 hover:underline"
-                    >
-                      + إضافة درس لهذا الفصل
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md"
-                >
-                  حفظ المنهج الطبعة واعتتماده
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Bulk CSV/Excel Simulation Card */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
-                <span>استيراد جماعي لمناهج الوزارة</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                استيراد جداول خطط المناهج المعتمدة من المديرية العامة للمناهج عبر ملف Excel/CSV مباشرة
-              </p>
-
-              <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center space-y-3">
-                <Upload className="w-8 h-8 text-slate-400 mx-auto" />
-                <div>
-                  <p className="text-xs font-bold text-slate-700">اسحب ملف المناهج المعتمد أو اضغط للاختيار</p>
-                  <p className="text-[11px] text-slate-500 mt-1">يدعم صيغ .XLSX, .CSV وفق قالب الوزارة الرسمى</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSimulateImport}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
-                >
-                  محاكاة استيراد ملف نموذج الوزارة
-                </button>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  onClick={() => alert('تم تحميل قالب المناهج الرسمي صيغة CSV')}
-                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>تحميل قالب Excel للمناهج الرسمية</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PLAN CREATION MODAL */}
       {isPlanModalOpen && (

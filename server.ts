@@ -432,18 +432,24 @@ function getSchoolData() {
       if (!data.notifications) data.notifications = [];
       if (!data.devicePushTokens) data.devicePushTokens = [];
       if (!data.notificationPreferences) data.notificationPreferences = [];
-      if (!data.stages) {
+      if (!data.stages || data.stages.length > 1) {
         data.stages = [
           { id: 'stg-1', name: 'المرحلة الابتدائية', code: 'PRIMARY', order: 1, requiresBranch: false },
-          { id: 'stg-2', name: 'المرحلة المتوسطة', code: 'INTERMEDIATE', order: 2, requiresBranch: false },
-          { id: 'stg-3', name: 'المرحلة الإعدادية', code: 'SECONDARY', order: 3, requiresBranch: true },
         ];
+      }
+      if (data.classes) {
+        data.classes = data.classes.filter((c: any) => c.stage === 'PRIMARY' || !c.stage || c.level?.includes('الابتدائي'));
+        if (data.classes.length === 0) {
+          data.classes = [
+            { id: 'c-1', stage: 'PRIMARY', level: 'الصف السادس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+            { id: 'c-2', stage: 'PRIMARY', level: 'الصف الخامس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+            { id: 'c-3', stage: 'PRIMARY', level: 'الصف الرابع الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+            { id: 'c-4', stage: 'PRIMARY', level: 'الصف الثالث الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+          ];
+        }
       }
       if (!data.branches) {
         data.branches = [
-          { id: 'br-1', name: 'الفرع العلمي', code: 'SCIENTIFIC', stageCode: 'SECONDARY' },
-          { id: 'br-2', name: 'الفرع الأدبي', code: 'LITERARY', stageCode: 'SECONDARY' },
-          { id: 'br-3', name: 'الفرع المهني', code: 'VOCATIONAL', stageCode: 'SECONDARY' },
           { id: 'br-4', name: 'الفرع العام', code: 'GENERAL', stageCode: 'PRIMARY' },
         ];
       }
@@ -475,14 +481,14 @@ function getSchoolData() {
           },
           {
             id: 't-2',
-            fullName: 'حسن سلمان الموسوي',
-            role: 'INSTRUCTOR',
-            email: 'instructor@iqschool.edu',
+            fullName: 'فاطمة كريم الأسدي',
+            role: 'TEACHER',
+            email: 'fatima@iqschool.edu',
             phone: '07700000002',
             passwordHash: '123456',
             status: 'ACTIVE',
-            assignedClassIds: ['c-3', 'c-4'],
-            assignedSubjects: ['الفيزياء', 'الكيمياء'],
+            assignedClassIds: ['c-2', 'c-3'],
+            assignedSubjects: ['الرياضيات', 'العلوم'],
             createdAt: '2024-09-15',
           },
           {
@@ -493,8 +499,100 @@ function getSchoolData() {
             phone: '07700000003',
             passwordHash: '123456',
             status: 'ACTIVE',
-            linkedStudentIds: [],
+            linkedStudentIds: ['st-3'],
             createdAt: '2024-09-15',
+          },
+        ];
+      }
+      if (!data.teachers || data.teachers.length === 0) {
+        data.teachers = [
+          {
+            id: 't-1',
+            name: 'أ. علي حسين الكاظمي',
+            fullName: 'أ. علي حسين الكاظمي',
+            type: 'TEACHER',
+            specialization: 'قواعد اللغة العربية',
+            phone: '07700000001',
+            email: 'teacher@iqschool.edu',
+            classes: 'الصف السادس الابتدائي - شعبة أ',
+            weeklyQuotas: 16,
+            employmentType: 'ملاك دائم',
+            appointmentDate: '2019-10-01',
+            registrationNumber: 'QD-2019-441',
+            createdAt: '2024-09-15',
+          },
+          {
+            id: 't-2',
+            name: 'أ. فاطمة كريم الأسدي',
+            fullName: 'أ. فاطمة كريم الأسدي',
+            type: 'TEACHER',
+            specialization: 'الرياضيات',
+            phone: '07700000002',
+            email: 'fatima@iqschool.edu',
+            classes: 'الصف الخامس الابتدائي - شعبة أ',
+            weeklyQuotas: 18,
+            employmentType: 'ملاك دائم',
+            appointmentDate: '2020-11-15',
+            registrationNumber: 'QD-2020-582',
+            createdAt: '2024-09-15',
+          },
+          {
+            id: 't-3',
+            name: 'أ. أحمد جاسم كاظم',
+            fullName: 'أ. أحمد جاسم كاظم',
+            type: 'TEACHER',
+            specialization: 'العلوم',
+            phone: '07801234561',
+            email: 'ahmed@iqschool.edu',
+            classes: 'الصف الرابع الابتدائي - شعبة أ',
+            weeklyQuotas: 14,
+            employmentType: 'عقد',
+            appointmentDate: '2022-09-20',
+            registrationNumber: 'QD-2022-809',
+            createdAt: '2024-09-15',
+          },
+        ];
+      }
+      if (!data.students || data.students.length === 0) {
+        data.students = [
+          {
+            id: 'st-1',
+            fullName: 'حيدر أحمد عباس',
+            stage: 'PRIMARY',
+            gradeLevel: 'الصف الرابع الابتدائي',
+            section: 'أ',
+            parentName: 'أحمد عباس جبر',
+            parentPhone: '07705551122',
+            birthDate: '2014-05-12',
+            academicYear: '2024 - 2025',
+            enrollmentNumber: 'ST-2024-101',
+            academicStatus: 'ACTIVE',
+          },
+          {
+            id: 'st-2',
+            fullName: 'جعفر علي حيدر',
+            stage: 'PRIMARY',
+            gradeLevel: 'الصف الخامس الابتدائي',
+            section: 'أ',
+            parentName: 'علي حيدر عبد الحسين',
+            parentPhone: '07701112233',
+            birthDate: '2013-08-20',
+            academicYear: '2024 - 2025',
+            enrollmentNumber: 'ST-2024-102',
+            academicStatus: 'ACTIVE',
+          },
+          {
+            id: 'st-3',
+            fullName: 'زينب محمد عبد الله',
+            stage: 'PRIMARY',
+            gradeLevel: 'الصف السادس الابتدائي',
+            section: 'أ',
+            parentName: 'محمد عبد الله العبيدي',
+            parentPhone: '07700000003',
+            birthDate: '2012-03-15',
+            academicYear: '2024 - 2025',
+            enrollmentNumber: 'ST-2024-103',
+            academicStatus: 'ACTIVE',
           },
         ];
       }
@@ -546,18 +644,6 @@ function getSchoolData() {
         createdAt: '2024-09-15',
       },
       {
-        id: 't-2',
-        fullName: 'حسن سلمان الموسوي',
-        role: 'INSTRUCTOR',
-        email: 'instructor@iqschool.edu',
-        phone: '07700000002',
-        passwordHash: '123456',
-        status: 'ACTIVE',
-        assignedClassIds: ['c-3', 'c-4'],
-        assignedSubjects: ['الفيزياء', 'الكيمياء'],
-        createdAt: '2024-09-15',
-      },
-      {
         id: 'u-parent',
         fullName: 'محمد عبد الله العبيدي',
         role: 'PARENT',
@@ -572,8 +658,8 @@ function getSchoolData() {
     classes: [
       { id: 'c-1', stage: 'PRIMARY', level: 'الصف السادس الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
       { id: 'c-2', stage: 'PRIMARY', level: 'الصف الخامس الابتدائي', section: 'ب', supervisorId: '', studentCount: 0 },
-      { id: 'c-3', stage: 'INTERMEDIATE', level: 'الصف الثالث المتوسط', section: 'أ', supervisorId: '', studentCount: 0 },
-      { id: 'c-4', stage: 'SECONDARY', level: 'الصف السادس العلمي', section: 'أ', supervisorId: '', studentCount: 0 },
+      { id: 'c-3', stage: 'PRIMARY', level: 'الصف الرابع الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
+      { id: 'c-4', stage: 'PRIMARY', level: 'الصف الثالث الابتدائي', section: 'أ', supervisorId: '', studentCount: 0 },
     ],
     subjects: [
       { id: 'sub-1', name: 'التربية الإسلامية', code: 'ISL-101', stage: 'PRIMARY', weeklyHours: 2 },
@@ -644,54 +730,200 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Authentication Endpoint: POST /api/auth/login
 app.post('/api/auth/login', (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور' });
-    }
-
+    const { role, fullName, phone, password, schoolName, studentName, email } = req.body;
     const data = getSchoolData();
-    const account = (data.accounts || []).find(
-      (acc: any) => acc.email.toLowerCase() === email.toLowerCase().trim()
-    );
 
-    if (!account) {
-      return res.status(401).json({ error: 'حساب غير موجود. يرجى التأكد من البريد الإلكتروني.' });
-    }
+    // 1. Director Login Flow
+    if (role === 'PRINCIPAL') {
+      if (!fullName?.trim() || !phone?.trim() || !password) {
+        return res.status(400).json({ error: 'يرجى إدخال الاسم الثلاثي ورقم الهاتف وكلمة المرور' });
+      }
 
-    if (account.passwordHash && account.passwordHash !== password) {
-      return res.status(401).json({ error: 'كلمة المرور غير صحيحة.' });
-    }
+      // Update school name if provided
+      if (schoolName && schoolName.trim()) {
+        data.schoolInfo.name = schoolName.trim();
+      }
+      data.schoolInfo.principal = fullName.trim();
 
-    if (account.status === 'SUSPENDED') {
-      return res.status(403).json({
-        error: 'حسابك موقوف بقرار إداري من قبل إدارة المدرسة. يرجى مراجعة المدير.',
+      let principalAccount = (data.accounts || []).find((acc: any) => acc.role === 'PRINCIPAL');
+      if (principalAccount) {
+        if (principalAccount.passwordHash && principalAccount.passwordHash !== password) {
+          return res.status(401).json({ error: 'كلمة المرور غير صحيحة' });
+        }
+        principalAccount.fullName = fullName.trim();
+        principalAccount.phone = phone.trim();
+      } else {
+        principalAccount = {
+          id: 'u-principal',
+          fullName: fullName.trim(),
+          role: 'PRINCIPAL',
+          email: 'principal@iqschool.edu',
+          phone: phone.trim(),
+          passwordHash: password,
+          status: 'ACTIVE',
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+        data.accounts = [principalAccount, ...(data.accounts || [])];
+      }
+
+      principalAccount.lastLogin = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+
+      const { passwordHash: _, ...sanitized } = principalAccount;
+      return res.json({
+        success: true,
+        account: sanitized,
+        token: `token-${principalAccount.id}-${Date.now()}`,
       });
     }
 
-    // Update last login timestamp
-    account.lastLogin = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    
-    // Log authentication audit entry
-    const newLog = {
-      id: `log-${Date.now()}`,
-      action: 'تسجيل دخول آمن',
-      category: 'ADMIN',
-      performedBy: account.fullName,
-      role: account.role,
-      details: `تسجيل دخول ناجح للحساب (${account.email}) بنوع صلاحية [${account.role}]`,
-      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-    };
-    data.auditLogs = [newLog, ...(data.auditLogs || [])];
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    // 2. Teacher Login Flow (Matching Name and Phone registered by Principal)
+    if (role === 'TEACHER') {
+      if (!fullName?.trim() || !phone?.trim()) {
+        return res.status(400).json({ error: 'يرجى إدخال الاسم الثلاثي ورقم الهاتف المسجل لدى إدارة المدرسة' });
+      }
 
-    // Return sanitized account object without passwordHash
-    const { passwordHash, ...sanitizedAccount } = account;
-    res.json({
-      success: true,
-      account: sanitizedAccount,
-      token: `token-${account.id}-${Date.now()}`,
-    });
+      const cleanInputName = fullName.replace(/^أ\.\s*/, '').trim().toLowerCase();
+      const cleanInputPhone = phone.replace(/\D/g, '');
+
+      // Check registered teachers list first
+      const matchedTeacher = (data.teachers || []).find((t: any) => {
+        const cleanTName = (t.name || '').replace(/^أ\.\s*/, '').trim().toLowerCase();
+        const cleanTPhone = (t.phone || '').replace(/\D/g, '');
+        return cleanTName.includes(cleanInputName) || cleanInputName.includes(cleanTName) || (cleanTPhone && cleanTPhone === cleanInputPhone);
+      });
+
+      // Check accounts
+      let teacherAccount = (data.accounts || []).find((a: any) => {
+        if (a.role !== 'TEACHER' && a.role !== 'INSTRUCTOR') return false;
+        const cleanAName = (a.fullName || '').replace(/^أ\.\s*/, '').trim().toLowerCase();
+        const cleanAPhone = (a.phone || '').replace(/\D/g, '');
+        return cleanAName.includes(cleanInputName) || (cleanAPhone && cleanAPhone === cleanInputPhone);
+      });
+
+      if (!matchedTeacher && !teacherAccount) {
+        return res.status(401).json({
+          error: 'لم يتم العثور على أستاذ بهذا الاسم ورقم الهاتف. يرجى مراجعة مدير المدرسة لتسجيلك في الكادر التدريسي أولاً.',
+        });
+      }
+
+      if (!teacherAccount) {
+        teacherAccount = {
+          id: matchedTeacher?.id || `t-${Date.now()}`,
+          fullName: matchedTeacher?.name || fullName.trim(),
+          role: 'TEACHER',
+          email: matchedTeacher?.email || 'teacher@iqschool.edu',
+          phone: matchedTeacher?.phone || phone.trim(),
+          status: 'ACTIVE',
+          assignedClassIds: matchedTeacher?.classes ? [matchedTeacher.classes] : ['c-1'],
+          assignedSubjects: matchedTeacher?.specialization ? [matchedTeacher.specialization] : ['قواعد اللغة العربية'],
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+        data.accounts = [teacherAccount, ...(data.accounts || [])];
+      }
+
+      teacherAccount.lastLogin = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+
+      const { passwordHash: _, ...sanitized } = teacherAccount;
+      return res.json({
+        success: true,
+        account: sanitized,
+        token: `token-${teacherAccount.id}-${Date.now()}`,
+      });
+    }
+
+    // 3. Parent Login Flow (Matching Name, Phone and Registered Student Name)
+    if (role === 'PARENT') {
+      if (!fullName?.trim() || !phone?.trim() || !studentName?.trim()) {
+        return res.status(400).json({ error: 'يرجى إدخال اسم ولي الأمر ورقم الهاتف واسم الطالب الثلاثي المسجل في المدرسة' });
+      }
+
+      const cleanStudentInput = studentName.trim().toLowerCase();
+      const matchedStudent = (data.students || []).find((s: any) => {
+        const cleanSName = (s.fullName || '').trim().toLowerCase();
+        return cleanSName === cleanStudentInput || cleanSName.includes(cleanStudentInput) || cleanStudentInput.includes(cleanSName);
+      });
+
+      if (!matchedStudent) {
+        return res.status(401).json({
+          error: 'لم يتم العثور على طالب مسجل بهذا الاسم في قاعدة بيانات المدرسة. يرجى التأكد من كتابة اسم الطالب الثلاثي كما هو مسجل لدى الأستاذ والمدير.',
+        });
+      }
+
+      // Find or create parent account and link student
+      let parentAccount = (data.accounts || []).find(
+        (a: any) => a.role === 'PARENT' && (a.phone === phone.trim() || a.fullName.trim().toLowerCase() === fullName.trim().toLowerCase())
+      );
+
+      const linkedIds = parentAccount?.linkedStudentIds || [];
+      if (!linkedIds.includes(matchedStudent.id)) {
+        linkedIds.push(matchedStudent.id);
+      }
+
+      if (parentAccount) {
+        parentAccount.fullName = fullName.trim();
+        parentAccount.phone = phone.trim();
+        parentAccount.linkedStudentIds = linkedIds;
+      } else {
+        parentAccount = {
+          id: `u-parent-${Date.now()}`,
+          fullName: fullName.trim(),
+          role: 'PARENT',
+          email: 'parent@iqschool.edu',
+          phone: phone.trim(),
+          status: 'ACTIVE',
+          linkedStudentIds: linkedIds,
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+        data.accounts = [parentAccount, ...(data.accounts || [])];
+      }
+
+      parentAccount.lastLogin = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+
+      const { passwordHash: _, ...sanitized } = parentAccount;
+      return res.json({
+        success: true,
+        account: sanitized,
+        token: `token-${parentAccount.id}-${Date.now()}`,
+      });
+    }
+
+    // 4. Legacy email/password fallback
+    if (email && password) {
+      const account = (data.accounts || []).find(
+        (acc: any) => acc.email.toLowerCase() === email.toLowerCase().trim()
+      );
+
+      if (!account) {
+        return res.status(401).json({ error: 'حساب غير موجود. يرجى التأكد من البيانات المدخلة.' });
+      }
+
+      if (account.passwordHash && account.passwordHash !== password) {
+        return res.status(401).json({ error: 'كلمة المرور غير صحيحة.' });
+      }
+
+      if (account.status === 'SUSPENDED') {
+        return res.status(403).json({
+          error: 'حسابك موقوف بقرار إداري من قبل إدارة المدرسة. يرجى مراجعة المدير.',
+        });
+      }
+
+      account.lastLogin = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+
+      const { passwordHash: _, ...sanitizedAccount } = account;
+      return res.json({
+        success: true,
+        account: sanitizedAccount,
+        token: `token-${account.id}-${Date.now()}`,
+      });
+    }
+
+    return res.status(400).json({ error: 'يرجى تقديم بيانات تسجيل الدخول المطلوبة' });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: 'حدث خطأ أثناء إجراء عملية المصادقة' });
   }
 });

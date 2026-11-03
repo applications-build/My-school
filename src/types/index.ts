@@ -73,7 +73,8 @@ export interface UserAccount {
 export interface Teacher {
   id: string;
   name: string; // Stored clean or formatted with «أ.»
-  type: 'TEACHER' | 'INSTRUCTOR'; // معلم (ابتدائي) أو مدرس (ثانوي/إعدادي)
+  fullName?: string; // Optional alias for consistency
+  type: 'TEACHER' | 'INSTRUCTOR'; // معلم (ابتدائي) أو مدرس
   specialization: string;
   qualification?: string; // e.g. بكالوريوس تربية، ماجستير، دبلوم، دكتوراه
   teachableSubjects?: string[];
@@ -81,6 +82,9 @@ export interface Teacher {
   email: string;
   classes: string;
   weeklyQuotas: number;
+  employmentType?: 'ملاك دائم' | 'عقد'; // نوع التعيين
+  appointmentDate?: string; // تاريخ التعيين بواسطة المدير
+  registrationNumber?: string; // رقم القيد (اختياري)
   createdAt: string;
 }
 
@@ -127,6 +131,7 @@ export interface Classroom {
   section: string;
   branch?: BranchType;
   supervisorId: string;
+  supervisorName?: string;
   studentCount: number;
 }
 
@@ -323,9 +328,11 @@ export interface GradeRecord {
   dailyScore?: number;
   month1: number;
   month2: number;
+  firstHalfAverage?: number; // معدل النصف الأول: (month1 + month2) / 2
   midYear: number;
-  month3?: number;
-  month4?: number;
+  month3?: number; // الشهر الأول بعد نصف السنة
+  month4?: number; // الشهر الثاني بعد نصف السنة
+  secondHalfAverage?: number; // معدل النصف الثاني: (month3 + month4) / 2
   oralScore?: number;
   practicalScore?: number;
   activityScore?: number;
@@ -447,6 +454,8 @@ export interface TimetableEntry {
   section: string;
   subject: string;
   teacherName: string;
+  slotType?: 'REGULAR' | 'VACANT' | 'HOLIDAY'; // شاغر أو عطلة
+  periodDurationMinutes?: number; // مدة الحصة بالدقائق
 }
 
 export interface NotificationItem {

@@ -1,8 +1,8 @@
 {
   "schoolInfo": {
-    "name": "مدرسة الرافدين النموذجية",
+    "name": "مدرسة الرافدين الابتدائية",
     "directorate": "المديرية العامة لتربية بغداد / الرصافة الأولى",
-    "principal": "مدير المدرسة",
+    "principal": "علي محمد حسن",
     "schoolCode": "IQ-BGD-2024-889",
     "academicYear": "2024 - 2025",
     "semester": "الفصل الدراسي الأول",
@@ -52,26 +52,96 @@
       "section": "ب",
       "supervisorId": "",
       "studentCount": 0
-    },
-    {
-      "id": "c-3",
-      "stage": "INTERMEDIATE",
-      "level": "الصف الثالث المتوسط",
-      "section": "أ",
-      "supervisorId": "",
-      "studentCount": 0
-    },
-    {
-      "id": "c-4",
-      "stage": "SECONDARY",
-      "level": "الصف السادس العلمي",
-      "section": "أ",
-      "supervisorId": "",
-      "studentCount": 0
     }
   ],
-  "teachers": [],
-  "students": [],
+  "teachers": [
+    {
+      "id": "t-1",
+      "name": "أ. علي حسين الكاظمي",
+      "fullName": "أ. علي حسين الكاظمي",
+      "type": "TEACHER",
+      "specialization": "قواعد اللغة العربية",
+      "phone": "07700000001",
+      "email": "teacher@iqschool.edu",
+      "classes": "الصف السادس الابتدائي - شعبة أ",
+      "weeklyQuotas": 16,
+      "employmentType": "ملاك دائم",
+      "appointmentDate": "2019-10-01",
+      "registrationNumber": "QD-2019-441",
+      "createdAt": "2024-09-15"
+    },
+    {
+      "id": "t-2",
+      "name": "أ. فاطمة كريم الأسدي",
+      "fullName": "أ. فاطمة كريم الأسدي",
+      "type": "TEACHER",
+      "specialization": "الرياضيات",
+      "phone": "07700000002",
+      "email": "fatima@iqschool.edu",
+      "classes": "الصف الخامس الابتدائي - شعبة أ",
+      "weeklyQuotas": 18,
+      "employmentType": "ملاك دائم",
+      "appointmentDate": "2020-11-15",
+      "registrationNumber": "QD-2020-582",
+      "createdAt": "2024-09-15"
+    },
+    {
+      "id": "t-3",
+      "name": "أ. أحمد جاسم كاظم",
+      "fullName": "أ. أحمد جاسم كاظم",
+      "type": "TEACHER",
+      "specialization": "العلوم",
+      "phone": "07801234561",
+      "email": "ahmed@iqschool.edu",
+      "classes": "الصف الرابع الابتدائي - شعبة أ",
+      "weeklyQuotas": 14,
+      "employmentType": "عقد",
+      "appointmentDate": "2022-09-20",
+      "registrationNumber": "QD-2022-809",
+      "createdAt": "2024-09-15"
+    }
+  ],
+  "students": [
+    {
+      "id": "st-1",
+      "fullName": "حيدر أحمد عباس",
+      "stage": "PRIMARY",
+      "gradeLevel": "الصف الرابع الابتدائي",
+      "section": "أ",
+      "parentName": "أحمد عباس جبر",
+      "parentPhone": "07705551122",
+      "birthDate": "2014-05-12",
+      "academicYear": "2024 - 2025",
+      "enrollmentNumber": "ST-2024-101",
+      "academicStatus": "ACTIVE"
+    },
+    {
+      "id": "st-2",
+      "fullName": "جعفر علي حيدر",
+      "stage": "PRIMARY",
+      "gradeLevel": "الصف الخامس الابتدائي",
+      "section": "أ",
+      "parentName": "علي حيدر عبد الحسين",
+      "parentPhone": "07701112233",
+      "birthDate": "2013-08-20",
+      "academicYear": "2024 - 2025",
+      "enrollmentNumber": "ST-2024-102",
+      "academicStatus": "ACTIVE"
+    },
+    {
+      "id": "st-3",
+      "fullName": "زينب محمد عبد الله",
+      "stage": "PRIMARY",
+      "gradeLevel": "الصف السادس الابتدائي",
+      "section": "أ",
+      "parentName": "محمد عبد الله العبيدي",
+      "parentPhone": "07700000003",
+      "birthDate": "2012-03-15",
+      "academicYear": "2024 - 2025",
+      "enrollmentNumber": "ST-2024-103",
+      "academicStatus": "ACTIVE"
+    }
+  ],
   "attendance": [],
   "grades": [],
   "lessonPlans": [],
@@ -559,20 +629,6 @@
       "code": "PRIMARY",
       "order": 1,
       "requiresBranch": false
-    },
-    {
-      "id": "stg-2",
-      "name": "المرحلة المتوسطة",
-      "code": "INTERMEDIATE",
-      "order": 2,
-      "requiresBranch": false
-    },
-    {
-      "id": "stg-3",
-      "name": "المرحلة الإعدادية",
-      "code": "SECONDARY",
-      "order": 3,
-      "requiresBranch": true
     }
   ],
   "branches": [
@@ -605,14 +661,28 @@
   "studentTransfers": [],
   "accounts": [
     {
+      "id": "u-parent-1793624576650",
+      "fullName": "أحمد عباس جبر",
+      "role": "PARENT",
+      "email": "parent@iqschool.edu",
+      "phone": "07705551122",
+      "status": "ACTIVE",
+      "linkedStudentIds": [
+        "st-1"
+      ],
+      "createdAt": "2026-11-02",
+      "lastLogin": "2026-11-02 13:02:56"
+    },
+    {
       "id": "u-principal",
-      "fullName": "مدير المدرسة",
+      "fullName": "علي محمد حسن",
       "role": "PRINCIPAL",
       "email": "principal@iqschool.edu",
-      "phone": "07700000000",
+      "phone": "07701234567",
       "passwordHash": "123456",
       "status": "ACTIVE",
-      "createdAt": "2024-09-15"
+      "createdAt": "2024-09-15",
+      "lastLogin": "2026-11-02 13:02:02"
     },
     {
       "id": "t-1",
@@ -630,7 +700,8 @@
         "قواعد اللغة العربية",
         "التربية الإسلامية"
       ],
-      "createdAt": "2024-09-15"
+      "createdAt": "2024-09-15",
+      "lastLogin": "2026-11-02 13:03:00"
     },
     {
       "id": "t-2",

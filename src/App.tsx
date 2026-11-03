@@ -13,13 +13,11 @@ import { GradesManager } from './components/GradesManager';
 import { LessonPlans } from './components/LessonPlans';
 import { CurriculumManager } from './components/CurriculumManager';
 import { Timetable } from './components/Timetable';
-import { ReportsCenter } from './components/ReportsCenter';
 import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
 import { Settings } from './components/Settings';
 import { DatabaseTester } from './components/DatabaseTester';
 import { AuditLogViewer } from './components/AuditLogViewer';
-import { GeminiChatbot } from './components/GeminiChatbot';
 import { ImageGenStudio } from './components/ImageGenStudio';
 import { AccountManagement } from './components/AccountManagement';
 import { RoleSwitcherModal } from './components/RoleSwitcherModal';
@@ -28,7 +26,7 @@ import {
   LayoutDashboard,
   CalendarCheck,
   Award,
-  Sparkles,
+  BookOpen,
   ShieldCheck,
   AlertCircle,
 } from 'lucide-react';
@@ -36,16 +34,33 @@ import {
 function AppContent() {
   const { loading, error, db } = useSchool();
   const [showSplash, setShowSplash] = useState<boolean>(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [tabHistory, setTabHistory] = useState<string[]>(['dashboard']);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState<boolean>(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+
+  const navigateTo = (tab: string) => {
+    if (tab === activeTab) return;
+    setTabHistory((prev) => [...prev, tab]);
+    setActiveTab(tab);
+  };
+
+  const handleBack = () => {
+    if (tabHistory.length > 1) {
+      const nextHistory = [...tabHistory];
+      nextHistory.pop();
+      const previousTab = nextHistory[nextHistory.length - 1];
+      setTabHistory(nextHistory);
+      setActiveTab(previousTab);
+    }
+  };
 
   if (showSplash) {
     return (
       <SplashScreen
         appName="مدرستي"
-        schoolName={db?.schoolInfo?.name || 'مدرسة الرافدين النموذجية'}
+        schoolName={db?.schoolInfo?.name || 'مدرسة النور الابتدائية للبنين'}
         onFinish={() => setShowSplash(false)}
       />
     );
@@ -97,22 +112,24 @@ function AppContent() {
       {/* Top Bar Navigation */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={navigateTo}
+        canGoBack={tabHistory.length > 1}
+        onBack={handleBack}
+        onLogout={() => setIsAuthenticated(false)}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
-        onOpenSyncModal={() => setIsSyncModalOpen(true)}
       />
 
       <div className="flex-1 max-w-7xl w-full mx-auto flex items-start">
         {/* Desktop Sidebar */}
         <Sidebar
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={navigateTo}
           onLogout={() => setIsAuthenticated(false)}
         />
 
         {/* Main Viewport Container */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 min-w-0">
-          {activeTab === 'dashboard' && <Dashboard onNavigate={(t) => setActiveTab(t)} />}
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-20 lg:pb-8 min-w-0">
+          {activeTab === 'dashboard' && <Dashboard onNavigate={(t) => navigateTo(t)} />}
           {activeTab === 'classes' && <ClassManagement />}
           {activeTab === 'staff' && <StaffManagement />}
           {activeTab === 'students' && <StudentDirectory />}
@@ -121,65 +138,63 @@ function AppContent() {
           {activeTab === 'lesson-plans' && <LessonPlans />}
           {activeTab === 'curriculum' && <CurriculumManager />}
           {activeTab === 'timetable' && <Timetable />}
-          {activeTab === 'reports' && <ReportsCenter />}
           {activeTab === 'notifications' && <Notifications />}
           {activeTab === 'profile' && <Profile />}
           {activeTab === 'settings' && <Settings />}
           {activeTab === 'tester' && <DatabaseTester />}
-          {activeTab === 'chatbot' && <GeminiChatbot />}
           {activeTab === 'studio' && <ImageGenStudio />}
           {activeTab === 'accounts' && <AccountManagement />}
           {activeTab === 'audit' && <AuditLogViewer />}
         </main>
       </div>
 
-      {/* Floating Mobile Bottom Action Strip (for iOS / Android quick switching) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-30 px-2 py-1.5 flex items-center justify-around shadow-lg">
+      {/* Floating Mobile Bottom Action Strip */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-30 px-3 py-2 flex items-center justify-around shadow-lg">
         <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex flex-col items-center gap-0.5 p-1 text-[10px] ${
+          onClick={() => navigateTo('dashboard')}
+          className={`flex flex-col items-center gap-1 p-1 text-[11px] ${
             activeTab === 'dashboard' ? 'text-emerald-700 font-bold' : 'text-slate-500'
           }`}
         >
-          <LayoutDashboard className="w-4 h-4" />
+          <LayoutDashboard className="w-5 h-5" />
           <span>الرئيسية</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center gap-0.5 p-1 text-[10px] ${
+          onClick={() => navigateTo('attendance')}
+          className={`flex flex-col items-center gap-1 p-1 text-[11px] ${
             activeTab === 'attendance' ? 'text-emerald-700 font-bold' : 'text-slate-500'
           }`}
         >
-          <CalendarCheck className="w-4 h-4" />
+          <CalendarCheck className="w-5 h-5" />
           <span>الغياب</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('grades')}
-          className={`flex flex-col items-center gap-0.5 p-1 text-[10px] ${
+          onClick={() => navigateTo('grades')}
+          className={`flex flex-col items-center gap-1 p-1 text-[11px] ${
             activeTab === 'grades' ? 'text-emerald-700 font-bold' : 'text-slate-500'
           }`}
         >
-          <Award className="w-4 h-4" />
+          <Award className="w-5 h-5" />
           <span>الدرجات</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('chatbot')}
-          className={`flex flex-col items-center gap-0.5 p-1 text-[10px] ${
-            activeTab === 'chatbot' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+          onClick={() => navigateTo('lesson-plans')}
+          className={`flex flex-col items-center gap-1 p-1 text-[11px] ${
+            activeTab === 'lesson-plans' ? 'text-emerald-700 font-bold' : 'text-slate-500'
           }`}
         >
-          <Sparkles className="w-4 h-4" />
-          <span>المساعد</span>
+          <BookOpen className="w-5 h-5" />
+          <span>التحضير</span>
         </button>
 
         <button
           onClick={() => setIsRoleModalOpen(true)}
-          className="flex flex-col items-center gap-0.5 p-1 text-[10px] text-emerald-800 font-bold"
+          className="flex flex-col items-center gap-1 p-1 text-[11px] text-emerald-800 font-bold"
         >
-          <ShieldCheck className="w-4 h-4" />
+          <ShieldCheck className="w-5 h-5" />
           <span>الحساب</span>
         </button>
       </div>

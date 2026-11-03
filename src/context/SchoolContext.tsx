@@ -48,7 +48,7 @@ import {
 } from '../services/api';
 
 // Role accounts representing each of the 4 required types
-export const DEMO_ACCOUNTS: Record<AccountType, UserAccount> = {
+export const DEMO_ACCOUNTS: Record<'PRINCIPAL' | 'TEACHER' | 'PARENT', UserAccount> = {
   PRINCIPAL: {
     id: 'u-principal',
     fullName: 'مدير المدرسة',
@@ -60,22 +60,12 @@ export const DEMO_ACCOUNTS: Record<AccountType, UserAccount> = {
   TEACHER: {
     id: 't-1',
     fullName: 'علي حسين الكاظمي',
-    role: 'TEACHER', // المعلم / المعلمة (المدارس الابتدائية)
+    role: 'TEACHER', // المعلم / الأستاذ (المدارس الابتدائية)
     email: 'teacher@iqschool.edu',
     phone: '07700000001',
     status: 'ACTIVE',
     assignedClassIds: ['c-1', 'c-2'],
     assignedSubjects: ['قواعد اللغة العربية', 'التربية الإسلامية'],
-  },
-  INSTRUCTOR: {
-    id: 't-2',
-    fullName: 'حسن سلمان الموسوي',
-    role: 'INSTRUCTOR', // المدرّس / المدرسة (المدارس المتوسطة والإعدادية)
-    email: 'instructor@iqschool.edu',
-    phone: '07700000002',
-    status: 'ACTIVE',
-    assignedClassIds: ['c-3', 'c-4'],
-    assignedSubjects: ['الفيزياء', 'الكيمياء'],
   },
   PARENT: {
     id: 'u-parent',
@@ -129,6 +119,7 @@ interface SchoolContextType {
   deleteStudent: (id: string) => Promise<void>;
   addClass: (cls: Omit<Classroom, 'id'>) => Promise<void>;
   updateClass: (id: string, updates: Partial<Classroom>) => Promise<void>;
+  deleteClass: (id: string) => Promise<void>;
   recordAttendance: (record: Omit<AttendanceRecord, 'id' | 'time'>) => Promise<void>;
   recordAttendanceBatch: (records: Array<Omit<AttendanceRecord, 'id' | 'time'>>) => Promise<void>;
   registerPushToken: (token: string, platform: 'ANDROID' | 'IOS' | 'WEB') => Promise<void>;
@@ -241,7 +232,7 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const switchRole = (role: AccountType) => {
     const accList = db?.accounts || [];
     const matchedAcc = accList.find((a) => a.role === role && a.status === 'ACTIVE');
-    const acc = matchedAcc || DEMO_ACCOUNTS[role];
+    const acc = matchedAcc || (DEMO_ACCOUNTS as Record<string, UserAccount>)[role] || DEMO_ACCOUNTS.PRINCIPAL;
     setCurrentAccount(acc);
     // Log role switch
     logAuditEvent({
@@ -550,8 +541,11 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Class Management
   const addClass = async (cls: Omit<Classroom, 'id'>) => {
     if (!db || !canEditClasses) return;
+    const supervisor = cls.supervisorId ? db.teachers.find((t) => t.id === cls.supervisorId) : undefined;
     const newCls: Classroom = {
       ...cls,
+      stage: 'PRIMARY',
+      supervisorName: supervisor ? formatTeacherName(supervisor.name) : cls.supervisorName || '',
       id: `c-${Date.now()}`,
     };
     const updated = {
@@ -563,11 +557,23 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const updateClass = async (id: string, updates: Partial<Classroom>) => {
     if (!db || !canEditClasses) return;
+    const supervisor = updates.supervisorId ? db.teachers.find((t) => t.id === updates.supervisorId) : undefined;
+    const supervisorName = supervisor ? formatTeacherName(supervisor.name) : updates.supervisorName;
     const updated = {
       ...db,
-      classes: db.classes.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+      classes: db.classes.map((c) => (c.id === id ? { ...c, ...updates, ...(supervisorName !== undefined ? { supervisorName } : {}) } : c)),
     };
     await commitDbChange(updated, 'تعديل بيانات شعبة', `تعديل الشعبة رقم ${id}`);
+  };
+
+  const deleteClass = async (id: string) => {
+    if (!db || !canEditClasses) return;
+    const target = db.classes.find((c) => c.id === id);
+    const updated = {
+      ...db,
+      classes: db.classes.filter((c) => c.id !== id),
+    };
+    await commitDbChange(updated, 'حذف شعبة دراسية', `حذف ${target ? `${target.level} (${target.section})` : id}`);
   };
 
   // Helper to calculate consecutive absences for a student
@@ -1392,6 +1398,7 @@ export const SchoolProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         deleteStudent,
         addClass,
         updateClass,
+        deleteClass,
         recordAttendance,
         recordAttendanceBatch,
         registerPushToken,

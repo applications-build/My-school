@@ -46,8 +46,8 @@ export const Notifications: React.FC = () => {
       if (n.targetRole === 'ALL' || n.targetRole === 'PARENT') return true;
       return false;
     }
-    if (currentAccount.role === 'TEACHER' || currentAccount.role === 'INSTRUCTOR') {
-      return n.targetRole === 'ALL' || n.targetRole === 'TEACHER' || n.targetRole === 'INSTRUCTOR';
+    if (currentAccount.role === 'TEACHER') {
+      return n.targetRole === 'ALL' || n.targetRole === 'TEACHER';
     }
     return true;
   });

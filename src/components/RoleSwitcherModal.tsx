@@ -14,7 +14,7 @@ export const RoleSwitcherModal: React.FC<Props> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const rolesList: {
-    type: AccountType;
+    type: 'PRINCIPAL' | 'TEACHER' | 'PARENT';
     title: string;
     description: string;
     icon: React.ReactNode;
@@ -23,32 +23,24 @@ export const RoleSwitcherModal: React.FC<Props> = ({ isOpen, onClose }) => {
   }[] = [
     {
       type: 'PRINCIPAL',
-      title: 'المدير',
-      description: 'إدارة المدرسة بكامل الصلاحيات، اعتماد الدرجات، إدارة الكادر، وسجلات التدقيق.',
+      title: 'مدير المدرسة',
+      description: 'إدارة المدرسة الابتدائية بكامل الصلاحيات، اعتماد الدرجات، إدارة الكادر، وسجلات التدقيق.',
       icon: <ShieldCheck className="w-5 h-5 text-indigo-600" />,
       color: 'border-indigo-200 bg-indigo-50/50 hover:border-indigo-400',
-      permissions: ['إدارة الكادر التدريسي والشعب', 'سجل التدقيق الإداري الحساس', 'أرشفة ونقل السنوات الدراسية', 'اعتماد الجداول والدرجات'],
+      permissions: ['إدارة كادر المعلمين والشعب', 'سجل التدقيق الإداري الحساس', 'أرشفة ونقل السنوات الدراسية', 'اعتماد الجداول والدرجات'],
     },
     {
       type: 'TEACHER',
-      title: 'المعلم / المعلمة (المدارس الابتدائية)',
+      title: 'المعلم / المعلمة (المرحلة الابتدائية)',
       description: 'مخصص للمرحلة الابتدائية: رصد الحضور، تسجيل درجات التقويم والامتحانات، والتحضير اليومي.',
       icon: <GraduationCap className="w-5 h-5 text-emerald-600" />,
       color: 'border-emerald-200 bg-emerald-50/50 hover:border-emerald-400',
       permissions: ['إضافة «أ.» تلقائياً قبل الاسم', 'رصد غياب صفوف وشعب المرحلة الابتدائية', 'تسجيل درجات نصف السنة والنهائي', 'كتابة التحضير والواجبات اليومية'],
     },
     {
-      type: 'INSTRUCTOR',
-      title: 'المدرّس / المدرسة (المدارس المتوسطة والإعدادية)',
-      description: 'مخصص للمرحلتين المتوسطة والإعدادية: إدارة درجات المواد التخصصية، السعي السنوي، والامتحانات الشهرية.',
-      icon: <UserCheck className="w-5 h-5 text-blue-600" />,
-      color: 'border-blue-200 bg-blue-50/50 hover:border-blue-400',
-      permissions: ['إضافة «أ.» تلقائياً قبل الاسم', 'رصد الامتحانات الشهرية والسعي التخصصي', 'إعداد خطط الدروس والواجبات الإعدادية', 'دفتر الدرجات والملاحظات السلوكية'],
-    },
-    {
       type: 'PARENT',
-      title: 'ولي أمر الطالب',
-      description: 'متابعة الأبناء الملتحقين بالمدرسة، الاطلاع على الدرجات والغياب اليومي والواجبات.',
+      title: 'ولي أمر التلميذ',
+      description: 'متابعة الأبناء الملتحقين بالمدرسة الابتدائية، الاطلاع على الدرجات والغياب اليومي والواجبات.',
       icon: <Users className="w-5 h-5 text-amber-600" />,
       color: 'border-amber-200 bg-amber-50/50 hover:border-amber-400',
       permissions: ['الاطلاع الفوري على بطاقة درجات الأبناء', 'متابعة إشعارات الغياب والتأخر اليومي', 'معرفة جدول الحصص والتحضير والواجبات', 'صلاحيات قراءة آمنة فقط (بدون «أ.»)'],
@@ -62,7 +54,7 @@ export const RoleSwitcherModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <div>
             <h3 className="text-lg font-bold text-slate-900">تبديل نوع الحساب والصلاحيات</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              يتيح النظام اختبار وتطبيق الصلاحيات المستقلة لكل حساب من الحسابات الأربعة المعتمدة
+              يتيح النظام اختبار وتطبيق الصلاحيات المستقلة لكل حساب من الحسابات الثلاثة المعتمدة
             </p>
           </div>
           <button
@@ -73,12 +65,12 @@ export const RoleSwitcherModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 my-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 my-5">
           {rolesList.map((r) => {
             const isSelected = currentAccount.role === r.type;
             const demoAcc = DEMO_ACCOUNTS[r.type];
             const displayName =
-              r.type === 'TEACHER' || r.type === 'INSTRUCTOR'
+              r.type === 'TEACHER'
                 ? formatTeacherName(demoAcc.fullName)
                 : demoAcc.fullName;
 

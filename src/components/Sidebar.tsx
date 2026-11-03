@@ -11,13 +11,11 @@ import {
   Calendar,
   Sparkles,
   ShieldCheck,
-  FileSpreadsheet,
   Bell,
   User,
   Settings,
-  Database,
-  Image,
   LogOut,
+  KeyRound,
 } from 'lucide-react';
 
 interface Props {
@@ -33,21 +31,19 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, onLogout }) 
     { id: 'dashboard', label: 'لوحة التحكم', icon: <LayoutDashboard className="w-4 h-4" /> },
     { id: 'classes', label: 'الصفوف والشعب', icon: <Layers className="w-4 h-4" /> },
     { id: 'staff', label: 'الكادر التدريسي', icon: <GraduationCap className="w-4 h-4" /> },
-    { id: 'students', label: 'الطلاب وأولياء الأمور', icon: <Users className="w-4 h-4" /> },
+    { id: 'students', label: 'التلاميذ وأولياء الأمور', icon: <Users className="w-4 h-4" /> },
     { id: 'attendance', label: 'الغياب والحضور', icon: <CalendarCheck className="w-4 h-4" /> },
     { id: 'grades', label: 'الدرجات والامتحانات', icon: <Award className="w-4 h-4" /> },
-    { id: 'lesson-plans', label: 'التحضير والواجبات', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'curriculum', label: 'إدارة المناهج ونسب الإنجاز', icon: <BookOpen className="w-4 h-4 text-amber-400" /> },
+    { id: 'lesson-plans', label: 'دفتر التحضير والواجبات', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'curriculum', label: 'إدارة المناهج والخطط', icon: <BookOpen className="w-4 h-4 text-emerald-400" /> },
     { id: 'timetable', label: 'الجدول الأسبوعي', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'reports', label: 'مركز التقارير والتصدير', icon: <FileSpreadsheet className="w-4 h-4" /> },
-    { id: 'chatbot', label: 'المساعد الذكي (Gemini)', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'studio', label: 'استوديو الوسائل', icon: <Image className="w-4 h-4" /> },
+    { id: 'studio', label: 'الشهادات والوسائل التعليمية', icon: <Sparkles className="w-4 h-4 text-purple-400" /> },
     { id: 'notifications', label: 'الإشعارات والتنبيهات', icon: <Bell className="w-4 h-4" /> },
     { id: 'profile', label: 'الملف الشخصي', icon: <User className="w-4 h-4" /> },
     { id: 'settings', label: 'إعدادات النظام والسنوات', icon: <Settings className="w-4 h-4" /> },
     ...(currentAccount.role === 'PRINCIPAL'
       ? [
-          { id: 'accounts', label: 'إدارة الحسابات والصلاحيات', icon: <Users className="w-4 h-4 text-emerald-400" /> },
+          { id: 'accounts', label: 'إدارة الحسابات والصلاحيات', icon: <KeyRound className="w-4 h-4 text-emerald-400" /> },
           { id: 'audit', label: 'سجل التدقيق الإداري', icon: <ShieldCheck className="w-4 h-4" /> },
         ]
       : []),

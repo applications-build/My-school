@@ -422,7 +422,7 @@ export const LessonPlans: React.FC = () => {
           }`}
         >
           <FolderArchive className="w-4 h-4" />
-          <span>أرشيف السنوات والطباعة</span>
+          <span>أرشيف السنوات الدراسية</span>
         </button>
       </div>
 
@@ -505,14 +505,6 @@ export const LessonPlans: React.FC = () => {
                           المعلم: <span className="font-bold text-emerald-800">{plan.teacherName}</span> | مادة: {plan.subject} ({plan.gradeLevel} - شعبة {plan.section})
                         </p>
                       </div>
-
-                      <button
-                        onClick={() => setPrintPlan(plan)}
-                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-all shrink-0"
-                        title="معاينة وطباعة دفتر التحضير"
-                      >
-                        <Printer className="w-4 h-4" />
-                      </button>
                     </div>
 
                     {/* Section Breakdown Details */}

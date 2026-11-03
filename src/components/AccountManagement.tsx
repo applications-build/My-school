@@ -198,9 +198,8 @@ export const AccountManagement: React.FC = () => {
             >
               <option value="ALL">جميع أنواع الحسابات</option>
               <option value="PRINCIPAL">مدير المدرسة</option>
-              <option value="TEACHER">معلم (ابتدائي)</option>
-              <option value="INSTRUCTOR">مدرّس (متوسط/ثانوي)</option>
-              <option value="PARENT">ولي أمر طالب</option>
+              <option value="TEACHER">الأستاذ / المعلم (ابتدائي)</option>
+              <option value="PARENT">ولي أمر تلميذ</option>
             </select>
           </div>
 
@@ -410,17 +409,13 @@ export const AccountManagement: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">نوع الحساب والصلاحية:</label>
-                  <select
-                    value={formState.role}
-                    onChange={(e) => setFormState({ ...formState, role: e.target.value as AccountType })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"
-                  >
-                    <option value="TEACHER">معلم (ابتدائي)</option>
-                    <option value="INSTRUCTOR">مدرّس (متوسط/ثانوي)</option>
-                    <option value="PARENT">ولي أمر طالب</option>
-                    <option value="PRINCIPAL">مدير المدرسة</option>
-                  </select>
+                  <label className="block font-bold text-slate-700 mb-1">نوع الحساب والصلاحية المتاحة:</label>
+                  <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl font-bold text-emerald-900 text-xs">
+                    الأستاذ / المعلم (ابتدائي)
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    * صلاحية المدير تقتصر على إضافة حسابات الكادر التدريسي فقط، ويتم دخول أولياء الأمور تلقائياً عبر مطابقة اسم التلميذ.
+                  </p>
                 </div>
 
                 <div>
